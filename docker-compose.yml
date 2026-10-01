@@ -1,0 +1,20 @@
+# Local development database only. Production uses Supabase PostgreSQL.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lawhi
+      POSTGRES_PASSWORD: ${LAWHI_DB_PASSWORD:?set LAWHI_DB_PASSWORD in .env}
+      POSTGRES_DB: lawhi
+    ports:
+      - '5433:5432'
+    volumes:
+      - lawhi-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lawhi -d lawhi']
+      interval: 5s
+      retries: 10
+
+volumes:
+  lawhi-db:

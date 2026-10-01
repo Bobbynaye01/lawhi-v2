@@ -1,0 +1,226 @@
+{
+ "source": "Lawhi Flutter lib/core/constants/app_constants.dart; every folder checked on everyayah.com (001001, 002255, 114006) on 2026-10-01",
+ "verifiedAt": "2026-10-01T00:00:00.000Z",
+ "reciters": [
+  {
+   "id": "ar.alafasy",
+   "nameAr": "مشاري العفاسي",
+   "nameFr": "Mishary Rachid Al-Afasy",
+   "nameEn": "Mishary Rachid Al-Afasy",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Alafasy_128kbps",
+   "enabled": true,
+   "sortOrder": 0
+  },
+  {
+   "id": "ar.mahermuaiqly",
+   "nameAr": "ماهر المعيقلي",
+   "nameFr": "Maher Al-Muaiqly",
+   "nameEn": "Maher Al-Muaiqly",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "MaherAlMuaiqly128kbps",
+   "enabled": true,
+   "sortOrder": 1
+  },
+  {
+   "id": "ar.abdurrahmaansudais",
+   "nameAr": "عبدالرحمن السديس",
+   "nameFr": "Abdurrahman Al-Sudais",
+   "nameEn": "Abdurrahman Al-Sudais",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Abdurrahmaan_As-Sudais_192kbps",
+   "enabled": true,
+   "sortOrder": 2
+  },
+  {
+   "id": "ar.saoodshuraym",
+   "nameAr": "سعود الشريم",
+   "nameFr": "Saoud Al-Shuraim",
+   "nameEn": "Saoud Al-Shuraim",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Saood_ash-Shuraym_128kbps",
+   "enabled": true,
+   "sortOrder": 3
+  },
+  {
+   "id": "ar.husary",
+   "nameAr": "محمود خليل الحصري",
+   "nameFr": "Mahmoud Khalil Al-Husary",
+   "nameEn": "Mahmoud Khalil Al-Husary",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Husary_128kbps",
+   "enabled": true,
+   "sortOrder": 4
+  },
+  {
+   "id": "ar.husarymujawwad",
+   "nameAr": "الحصري — مجوّد",
+   "nameFr": "Al-Husary Mujawwad",
+   "nameEn": "Al-Husary Mujawwad",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Husary_Mujawwad_64kbps",
+   "enabled": true,
+   "sortOrder": 5
+  },
+  {
+   "id": "ar.minshawi",
+   "nameAr": "محمد صديق المنشاوي",
+   "nameFr": "Muhammad Siddiq Al-Minshawi",
+   "nameEn": "Muhammad Siddiq Al-Minshawi",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Minshawy_Murattal_128kbps",
+   "enabled": true,
+   "sortOrder": 6
+  },
+  {
+   "id": "ar.minshawimujawwad",
+   "nameAr": "المنشاوي — مجوّد",
+   "nameFr": "Al-Minshawi Mujawwad",
+   "nameEn": "Al-Minshawi Mujawwad",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Minshawy_Mujawwad_192kbps",
+   "enabled": true,
+   "sortOrder": 7
+  },
+  {
+   "id": "ar.muhammadayyoub",
+   "nameAr": "محمد أيوب",
+   "nameFr": "Muhammad Ayyoub",
+   "nameEn": "Muhammad Ayyoub",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Muhammad_Ayyoub_128kbps",
+   "enabled": true,
+   "sortOrder": 8
+  },
+  {
+   "id": "ar.abdullahbasfar",
+   "nameAr": "عبدالله بصفر",
+   "nameFr": "Abdullah Basfar",
+   "nameEn": "Abdullah Basfar",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Abdullah_Basfar_192kbps",
+   "enabled": true,
+   "sortOrder": 9
+  },
+  {
+   "id": "ar.shaatree",
+   "nameAr": "أبو بكر الشاطري",
+   "nameFr": "Abou Bakr Al-Shatri",
+   "nameEn": "Abou Bakr Al-Shatri",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Abu_Bakr_Ash-Shaatree_128kbps",
+   "enabled": true,
+   "sortOrder": 10
+  },
+  {
+   "id": "ar.ibrahimakhdar",
+   "nameAr": "إبراهيم الأخضر",
+   "nameFr": "Ibrahim Al-Akhdar",
+   "nameEn": "Ibrahim Al-Akhdar",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Ibrahim_Akhdar_32kbps",
+   "enabled": true,
+   "sortOrder": 11
+  },
+  {
+   "id": "ar.hanirifai",
+   "nameAr": "هاني الرفاعي",
+   "nameFr": "Hani Ar-Rifai",
+   "nameEn": "Hani Ar-Rifai",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Hani_Rifai_192kbps",
+   "enabled": true,
+   "sortOrder": 12
+  },
+  {
+   "id": "ar.aymanswoaid",
+   "nameAr": "أيمن سويد",
+   "nameFr": "Ayman Swaid",
+   "nameEn": "Ayman Swaid",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Ayman_Sowaid_64kbps",
+   "enabled": true,
+   "sortOrder": 13
+  },
+  {
+   "id": "ar.abdulbasitabdulsamad",
+   "nameAr": "عبدالباسط — مرتّل",
+   "nameFr": "Abdul Basit Murattal",
+   "nameEn": "Abdul Basit Murattal",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Abdul_Basit_Murattal_192kbps",
+   "enabled": true,
+   "sortOrder": 14
+  },
+  {
+   "id": "ar.abdulbasitmujawwad",
+   "nameAr": "عبدالباسط — مجوّد",
+   "nameFr": "Abdul Basit Mujawwad",
+   "nameEn": "Abdul Basit Mujawwad",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Abdul_Basit_Mujawwad_128kbps",
+   "enabled": true,
+   "sortOrder": 15
+  },
+  {
+   "id": "ar.muhammadjibreel",
+   "nameAr": "محمد جبريل",
+   "nameFr": "Muhammad Jibreel",
+   "nameEn": "Muhammad Jibreel",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Muhammad_Jibreel_128kbps",
+   "enabled": true,
+   "sortOrder": 16
+  },
+  {
+   "id": "ar.ahmedajamy",
+   "nameAr": "أحمد العجمي",
+   "nameFr": "Ahmad Al-Ajami",
+   "nameEn": "Ahmad Al-Ajami",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net",
+   "enabled": true,
+   "sortOrder": 17
+  },
+  {
+   "id": "ea.nasser",
+   "nameAr": "ناصر القطامي",
+   "nameFr": "Nasser Al-Qatami",
+   "nameEn": "Nasser Al-Qatami",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Nasser_Alqatami_128kbps",
+   "enabled": true,
+   "sortOrder": 18
+  },
+  {
+   "id": "ea.yasser",
+   "nameAr": "ياسر الدوسري",
+   "nameFr": "Yasser Al-Dossari",
+   "nameEn": "Yasser Al-Dossari",
+   "riwaya": "hafs",
+   "provider": "everyayah",
+   "folder": "Yasser_Ad-Dussary_128kbps",
+   "enabled": true,
+   "sortOrder": 19
+  }
+ ]
+}

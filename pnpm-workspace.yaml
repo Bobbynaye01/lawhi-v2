@@ -8,3 +8,5 @@ onlyBuiltDependencies:
   - prisma
   - "@prisma/engines"
   - "@nestjs/core"
+  - "@parcel/watcher"
+  - unrs-resolver

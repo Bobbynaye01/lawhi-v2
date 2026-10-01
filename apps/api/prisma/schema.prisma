@@ -1,0 +1,353 @@
+// Lawhi — PostgreSQL schema (local Docker in dev, Supabase in production).
+// Migrations must stay additive: never drop or reset data without explicit approval.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  user
+  admin
+}
+
+enum AccountStatus {
+  active
+  deactivated
+}
+
+/// Mirrors a Supabase Auth user. `id` is the Supabase `auth.users.id` (JWT `sub`).
+model User {
+  id            String        @id @db.Uuid
+  email         String?       @unique
+  displayName   String?
+  role          Role          @default(user)
+  status        AccountStatus @default(active)
+  deactivatedAt DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  settings         UserSettings?
+  readingPositions ReadingPosition[]
+  bookmarks        Bookmark[]
+  donations        Donation[]        @relation("DonationDonor")
+  reviewedDonations Donation[]       @relation("DonationReviewer")
+  donationEvents   DonationEvent[]
+}
+
+enum ThemePreference {
+  system
+  light
+  dark
+}
+
+enum NotificationMode {
+  off
+  notification
+  adhan
+}
+
+model UserSettings {
+  userId           String           @id @db.Uuid
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locale           String           @default("ar")
+  riwaya           Riwaya           @default(hafs)
+  reciterId        String?
+  fontScale        Float            @default(1)
+  theme            ThemePreference  @default(system)
+  prayerMethod     String           @default("MuslimWorldLeague")
+  madhab           String           @default("shafi")
+  notificationMode NotificationMode @default(notification)
+  updatedAt        DateTime         @updatedAt
+}
+
+// ─── Quran ────────────────────────────────────────────────────────────────────
+
+enum Riwaya {
+  hafs
+  warsh
+}
+
+enum RevelationPlace {
+  makkah
+  madinah
+}
+
+model Surah {
+  id              Int             @id
+  nameAr          String
+  nameTranslit    String
+  nameFr          String
+  nameEn          String
+  revelationPlace RevelationPlace
+  bismillahPre    Boolean
+  versesHafs      Int
+  versesWarsh     Int
+}
+
+model Verse {
+  id         Int     @id @default(autoincrement())
+  riwaya     Riwaya
+  surah      Int
+  verse      Int
+  text       String
+  /// Normalized text (no harakat) used for search; see @lawhi/shared normalizeArabicForSearch.
+  textSearch String
+  page       Int
+  juz        Int
+  hizb       Int
+  rub        Int
+  sajda      Boolean @default(false)
+  /// Warsh only: matching Hafs verse numbers (for audio/cross-reference).
+  hafsVerses Int[]
+
+  @@unique([riwaya, surah, verse])
+  @@index([riwaya, juz])
+  @@index([riwaya, hizb])
+  @@index([riwaya, rub])
+  @@index([riwaya, page])
+  @@index([textSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+enum AudioProvider {
+  everyayah
+}
+
+model Reciter {
+  id         String        @id
+  nameAr     String
+  nameFr     String
+  nameEn     String
+  riwaya     Riwaya
+  provider   AudioProvider
+  /// Provider folder, e.g. "Alafasy_128kbps" on everyayah.com.
+  folder     String
+  enabled    Boolean       @default(true)
+  /// Last time sample files were checked to exist on the provider.
+  verifiedAt DateTime?
+  sortOrder  Int           @default(0)
+}
+
+model ReadingPosition {
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riwaya    Riwaya
+  surah     Int
+  verse     Int
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, riwaya])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riwaya    Riwaya
+  surah     Int
+  verse     Int
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, riwaya, surah, verse])
+}
+
+// ─── Adhkar & ad'iya ─────────────────────────────────────────────────────────
+
+enum DhikrKind {
+  adhkar
+  dua
+}
+
+model DhikrCategory {
+  id        String    @id
+  kind      DhikrKind
+  titleAr   String
+  titleFr   String
+  titleEn   String
+  icon      String
+  sortOrder Int
+  items     Dhikr[]
+}
+
+model Dhikr {
+  id            String        @id
+  categoryId    String
+  category      DhikrCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sortOrder     Int
+  title         String?
+  arabicText    String
+  /// Only filled from a recognised published translation — never generated.
+  translationFr String?
+  translationEn String?
+  repetitions   Int           @default(1)
+  source        String
+  virtue        String?
+
+  @@index([categoryId, sortOrder])
+}
+
+// ─── Library ──────────────────────────────────────────────────────────────────
+
+enum BookFormat {
+  pdf
+  text
+}
+
+model Book {
+  id          String        @id
+  titleAr     String
+  titleFr     String
+  titleEn     String
+  authorAr    String
+  description String
+  format      BookFormat
+  /// For PDF books: public download URL (archive.org).
+  pdfUrl      String?
+  /// For text books: true when only selected entries are included.
+  isExcerpt   Boolean       @default(false)
+  sortOrder   Int           @default(0)
+  chapters    BookChapter[]
+}
+
+model BookChapter {
+  id        String      @id
+  bookId    String
+  book      Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  title     String
+  sortOrder Int
+  entries   BookEntry[]
+
+  @@index([bookId, sortOrder])
+}
+
+model BookEntry {
+  id        String      @id
+  chapterId String
+  chapter   BookChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  number    Int
+  text      String
+  narrator  String?
+  reference String?
+
+  @@index([chapterId, number])
+}
+
+// ─── Donations ────────────────────────────────────────────────────────────────
+
+enum Currency {
+  MRU
+}
+
+enum DonationStatus {
+  pending
+  submitted
+  confirmed
+  rejected
+  cancelled
+}
+
+enum PaymentOperator {
+  bankily
+  masrivi
+  bimbank
+  click
+  sedad
+  bamis_digital
+  bci_pay
+}
+
+model DonationCause {
+  id            String     @id @default(uuid()) @db.Uuid
+  slug          String     @unique
+  titleAr       String
+  titleFr       String
+  titleEn       String
+  descriptionAr String
+  descriptionFr String
+  descriptionEn String
+  /// Target in MRU; null when the cause has no fixed goal.
+  goalAmount    Int?
+  featured      Boolean    @default(false)
+  active        Boolean    @default(true)
+  sortOrder     Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  donations     Donation[]
+}
+
+/// Controlled by admins. A method can only be enabled with a real phone number.
+model PaymentMethod {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  operator     PaymentOperator @unique
+  phoneNumber  String?
+  instructions String?
+  enabled      Boolean         @default(false)
+  sortOrder    Int             @default(0)
+  updatedAt    DateTime        @updatedAt
+  donations    Donation[]
+}
+
+model Donation {
+  id              String         @id @default(uuid()) @db.Uuid
+  /// Short human-readable code shown to the donor and the admin (e.g. LW-7K3P9Q).
+  code            String         @unique
+  amount          Int
+  currency        Currency       @default(MRU)
+  donorName       String?
+  donorPhone      String?
+  userId          String         @db.Uuid
+  user            User           @relation("DonationDonor", fields: [userId], references: [id])
+  causeId         String         @db.Uuid
+  cause           DonationCause  @relation(fields: [causeId], references: [id])
+  paymentMethodId String         @db.Uuid
+  paymentMethod   PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
+  /// Transaction reference typed by the donor (operator receipt number).
+  reference       String?
+  status          DonationStatus @default(pending)
+  /// Private storage path of the proof (never a public URL).
+  proofPath       String?
+  rejectionReason String?
+  reviewedById    String?        @db.Uuid
+  reviewedBy      User?          @relation("DonationReviewer", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  events          DonationEvent[]
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@index([causeId, status])
+}
+
+/// Append-only audit trail of every status change.
+model DonationEvent {
+  id         String          @id @default(uuid()) @db.Uuid
+  donationId String          @db.Uuid
+  donation   Donation        @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  fromStatus DonationStatus?
+  toStatus   DonationStatus
+  actorId    String?         @db.Uuid
+  actor      User?           @relation(fields: [actorId], references: [id])
+  note       String?
+  createdAt  DateTime        @default(now())
+
+  @@index([donationId, createdAt])
+}
+
+// ─── App configuration ───────────────────────────────────────────────────────
+
+/// Server-controlled public configuration (e.g. donation amount presets).
+model AppConfig {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

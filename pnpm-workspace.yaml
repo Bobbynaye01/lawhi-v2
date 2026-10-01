@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Packages allowed to run install scripts.
+onlyBuiltDependencies:
+  - esbuild
+  - prisma
+  - "@prisma/engines"
+  - "@nestjs/core"

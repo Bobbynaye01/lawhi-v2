@@ -1,0 +1,17 @@
+{
+  "name": "@lawhi/quran-data",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Données vérifiées du Coran (Hafs, Warsh) générées à partir de sources documentées",
+  "type": "module",
+  "exports": {
+    "./surahs.json": "./data/surahs.json",
+    "./hafs.json": "./data/hafs.json",
+    "./warsh.json": "./data/warsh.json",
+    "./manifest.json": "./data/manifest.json"
+  },
+  "scripts": {
+    "generate": "node scripts/build.ts",
+    "test": "node scripts/build.ts --check"
+  }
+}

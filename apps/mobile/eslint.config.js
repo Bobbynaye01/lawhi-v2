@@ -1,0 +1,11 @@
+// @ts-check
+const expoConfig = require('eslint-config-expo/flat');
+
+module.exports = [
+  ...expoConfig,
+  { ignores: ['dist/**', '.expo/**', 'android/**', 'ios/**', 'coverage/**'] },
+  {
+    files: ['**/*.{ts,tsx,js}'],
+    rules: { 'no-console': ['error', { allow: ['warn', 'error'] }] },
+  },
+];

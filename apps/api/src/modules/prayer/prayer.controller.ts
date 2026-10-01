@@ -1,10 +1,15 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { DEFAULT_MADHAB, DEFAULT_PRAYER_METHOD, PRAYER_METHODS, type Locale } from '@lawhi/shared';
+import {
+  computePrayerDays,
+  DEFAULT_MADHAB,
+  DEFAULT_PRAYER_METHOD,
+  PRAYER_METHODS,
+  type Locale,
+} from '@lawhi/shared';
 import { Public } from '../../common/decorators/auth.decorators';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { NominatimClient } from './nominatim.client';
-import { computePrayerDays } from './prayer-calculator';
 import {
   citySearchQuerySchema,
   prayerTimesQuerySchema,

@@ -1,0 +1,14 @@
+{
+  "name": "@lawhi/i18n",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Traductions de l'interface Lawhi (ar, fr, en)",
+  "exports": {
+    "./ar.json": "./locales/ar.json",
+    "./fr.json": "./locales/fr.json",
+    "./en.json": "./locales/en.json"
+  },
+  "scripts": {
+    "test": "node scripts/check.mjs"
+  }
+}

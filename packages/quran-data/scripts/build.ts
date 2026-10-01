@@ -57,6 +57,7 @@ interface WarshAyah {
 interface WarshSource {
   id: number;
   rawi?: { name?: string };
+  bismillah?: string;
   surahs: { id: number; ayahs: WarshAyah[] }[];
 }
 
@@ -201,6 +202,8 @@ function buildHafs(expectedCounts: Map<number, number>) {
 
   return {
     riwaya: 'hafs',
+    /** Basmala shown above surahs (2–114 except 9): the verified text of 1:1. */
+    bismillah: verses[0]![2],
     source:
       'Tanzil Uthmani (via api.alquran.cloud), cross-checked letter by letter with api.quran.com; rub al-hizb from api.quran.com',
     license: 'Tanzil Quran Text — verbatim copy permitted with attribution (tanzil.net)',
@@ -265,10 +268,13 @@ function buildWarsh(hafs: { verses: HafsVerse[] }) {
     fail(`Warsh source unexpectedly small: ${verses.length} verses, ${maxPage} pages`);
   }
   if (identicalToHafs === verses.length) fail('Warsh source is identical to Hafs');
+  const bismillah = source.bismillah?.trim() ?? fail('Warsh source has no basmala');
+  if (rasm(bismillah) !== BASMALA_RASM) fail('Unexpected Warsh basmala');
 
   return {
     data: {
       riwaya: 'warsh',
+      bismillah,
       source: 'Quranpedia mushaf 4 — KFGQPC Warsh ʿan Nāfiʿ',
       license: 'King Fahd Glorious Quran Printing Complex — free use, unmodified text, attribution',
       verseCount: verses.length,

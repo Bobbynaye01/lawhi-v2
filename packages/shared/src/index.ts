@@ -5,3 +5,5 @@ export * from './phone';
 export * from './prayer';
 export * from './qibla';
 export * from './quran';
+export * from './prayer-schedule';
+export * from './prayer-times';

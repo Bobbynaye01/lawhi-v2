@@ -5,7 +5,7 @@ import {
   type Madhab,
   type Prayer,
   type PrayerMethodId,
-} from '@lawhi/shared';
+} from './prayer';
 
 export interface PrayerDay {
   date: string;

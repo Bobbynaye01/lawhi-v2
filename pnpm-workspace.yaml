@@ -10,3 +10,8 @@ onlyBuiltDependencies:
   - "@nestjs/core"
   - "@parcel/watcher"
   - unrs-resolver
+
+overrides:
+  # brace-expansion@1 needs balanced-match@1; the hoisted layout otherwise
+  # resolves it to balanced-match@4 (different API) and breaks ESLint.
+  "brace-expansion@1>balanced-match": "^1.0.2"

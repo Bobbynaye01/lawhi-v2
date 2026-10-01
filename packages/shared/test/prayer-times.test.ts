@@ -1,4 +1,5 @@
-import { computePrayerDays } from './prayer-calculator';
+import { describe, expect, it } from 'vitest';
+import { computePrayerDays } from '../src/prayer-times';
 
 const NOUAKCHOTT = { latitude: 18.0735, longitude: -15.9582 };
 

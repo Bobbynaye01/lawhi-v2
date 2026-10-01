@@ -2,12 +2,12 @@
   "hafs": {
     "verses": 6236,
     "pages": 604,
-    "sha256": "f21555283342483d8b731013692d184b593bb05097d26fd6cb0d2d4449cd50cc"
+    "sha256": "a9aaca0714076323e906ec3a906fe1b509d7a20276e87c572d1e20a0e043c93d"
   },
   "warsh": {
     "verses": 6213,
     "pages": 604,
-    "sha256": "3bd6271e4174c327a392390014b1103157bbbfd5997a0443d4a0672a9c45a210"
+    "sha256": "5571ba7a00b67ab1adeed48f5733093c74ad803a9f98977a0b16cb2650869f63"
   },
   "surahs": {
     "count": 114,

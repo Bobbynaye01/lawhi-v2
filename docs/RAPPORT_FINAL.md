@@ -1,6 +1,6 @@
 # Lawhi v2 — rapport de reconstruction
 
-_1er octobre 2026 — dépôt `C:\Users\MO\lawhi-v2` (Git local, non poussé), 7 commits._
+_1er octobre 2026 — dépôt `C:\Users\MO\lawhi-v2` (Git local, non poussé)._
 
 ## 1. Architecture
 

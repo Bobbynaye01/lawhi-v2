@@ -228,7 +228,7 @@ const str = (v: Value | undefined) => (typeof v === 'string' ? v : null);
 const flutterRoot = process.argv[2];
 if (!flutterRoot) throw new Error('Usage: node scripts/extract-flutter-content.mts <flutter-project>');
 const feat = join(flutterRoot, 'lib', 'features');
-const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'database', 'seed', 'data');
+const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'packages', 'content', 'data');
 
 // Adhkar
 const adhkarScope = load(join(feat, 'adhkar/presentation/adhkar_screen.dart'));
@@ -364,6 +364,42 @@ const texts = textBooks.map(([file, symbol], index) => {
   };
 });
 
+// Merge each PDF with its text excerpt (same work, different ids in the Flutter app).
+/** archive.org links found broken on 2026-10-01 (404 / 401) — not published until replaced. */
+const BROKEN_PDF_IDS = new Set(['nawawi40', 'adhkar_nawawi']);
+const PDF_TO_TEXT_ID: Record<string, string> = { riyad: 'riyadh' };
+const TITLES: Record<string, { fr: string; en: string }> = {
+  bukhari: { fr: 'Sahih al-Bukhari', en: 'Sahih al-Bukhari' },
+  muslim: { fr: 'Sahih Muslim', en: 'Sahih Muslim' },
+  riyadh: { fr: 'Riyad as-Salihin', en: 'Riyad as-Salihin' },
+  nawawi40: { fr: 'Les quarante hadiths d’an-Nawawi', en: 'An-Nawawi’s Forty Hadith' },
+  hisn: { fr: 'La citadelle du musulman (Hisn al-Muslim)', en: 'Fortress of the Muslim (Hisn al-Muslim)' },
+  bulugh: { fr: 'Bulugh al-Maram', en: 'Bulugh al-Maram' },
+  adhkar_nawawi: { fr: 'Al-Adhkar d’an-Nawawi', en: 'Al-Adhkar by an-Nawawi' },
+};
+const textById = new Map(texts.map((t) => [t.id, t]));
+const books = pdfBooks.map((pdf) => {
+  const id = PDF_TO_TEXT_ID[pdf.id] ?? pdf.id;
+  const text = textById.get(id);
+  const titles = TITLES[id];
+  if (!text || !titles) throw new Error(`No text excerpt or titles for book ${id}`);
+  textById.delete(id);
+  return {
+    id,
+    titleAr: pdf.titleAr,
+    titleFr: titles.fr,
+    titleEn: titles.en,
+    authorAr: text.authorAr,
+    description: text.description,
+    pdfUrl: BROKEN_PDF_IDS.has(pdf.id) ? null : pdf.pdfUrl,
+    pdfSizeMB: BROKEN_PDF_IDS.has(pdf.id) ? null : pdf.estimatedSizeMB,
+    isExcerpt: text.isExcerpt,
+    sortOrder: pdf.sortOrder,
+    chapters: text.chapters,
+  };
+});
+if (textById.size > 0) throw new Error(`Text books without catalogue entry: ${[...textById.keys()].join(', ')}`);
+
 const counts = {
   adhkarCategories: adhkar.length,
   adhkar: adhkar.reduce((n, c) => n + c.items.length, 0),
@@ -375,5 +411,5 @@ const counts = {
 };
 const header = { source: 'Lawhi Flutter app (lib/features), extracted verbatim', extractedAt: '2026-10-01' };
 writeFileSync(join(outDir, 'adhkar.json'), JSON.stringify({ ...header, categories: [...adhkar, ...adiya] }, null, 1));
-writeFileSync(join(outDir, 'library.json'), JSON.stringify({ ...header, pdfBooks, textBooks: texts }, null, 1));
+writeFileSync(join(outDir, 'library.json'), JSON.stringify({ ...header, books }, null, 1));
 console.warn(JSON.stringify(counts));

@@ -20,6 +20,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@lawhi/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@lawhi/quran-data':
         specifier: workspace:*
         version: link:../../packages/quran-data
@@ -144,6 +147,8 @@ importers:
       typescript-eslint:
         specifier: ^8.71.0
         version: 8.71.0(eslint@9.39.5(jiti@2.7.0))(typescript@6.0.3)
+
+  packages/content: {}
 
   packages/quran-data: {}
 

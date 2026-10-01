@@ -1,0 +1,11 @@
+{
+  "name": "@lawhi/content",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Contenus religieux validés (adhkar, ad'iya, extraits de livres) et catalogue des récitateurs vérifiés — extraits à l'identique de l'app Flutter",
+  "exports": {
+    "./adhkar.json": "./data/adhkar.json",
+    "./library.json": "./data/library.json",
+    "./reciters.json": "./data/reciters.json"
+  }
+}

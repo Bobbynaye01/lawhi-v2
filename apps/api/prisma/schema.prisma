@@ -211,6 +211,8 @@ model Book {
   format      BookFormat
   /// For PDF books: public download URL (archive.org).
   pdfUrl      String?
+  /// Approximate PDF size, shown before downloading.
+  pdfSizeMb   Int?
   /// For text books: true when only selected entries are included.
   isExcerpt   Boolean       @default(false)
   sortOrder   Int           @default(0)

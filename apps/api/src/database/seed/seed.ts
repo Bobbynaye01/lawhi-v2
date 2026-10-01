@@ -14,8 +14,10 @@ import { normalizeArabicForSearch } from '@lawhi/shared';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, type PaymentOperator, type Riwaya } from '../../generated/prisma/client';
 
-const dataDir = join(__dirname, '..', '..', '..', 'src', 'database', 'seed', 'data');
-const readData = <T>(file: string): T => JSON.parse(readFileSync(join(dataDir, file), 'utf8')) as T;
+const seedDir = join(__dirname, '..', '..', '..', 'src', 'database', 'seed');
+const readSeed = <T>(file: string): T => JSON.parse(readFileSync(join(seedDir, file), 'utf8')) as T;
+const readData = <T>(file: string): T =>
+  JSON.parse(readFileSync(require.resolve(`@lawhi/content/${file}`), 'utf8')) as T;
 const quranData = <T>(file: string): T =>
   JSON.parse(readFileSync(require.resolve(`@lawhi/quran-data/${file}`), 'utf8')) as T;
 
@@ -169,29 +171,19 @@ async function seedAdhkar(prisma: PrismaClient) {
   console.warn(`adhkar: ${categories.length} categories, ${count} items`);
 }
 
-/** archive.org links found broken on 2026-10-01 (404 / 401) — not published until replaced. */
-const BROKEN_PDF_IDS = new Set(['nawawi40', 'adhkar_nawawi']);
-/** The PDF catalogue and the text excerpts used different ids for the same book. */
-const PDF_TO_TEXT_ID: Record<string, string> = { riyad: 'riyadh' };
-const TITLES: Record<string, { fr: string; en: string }> = {
-  bukhari: { fr: 'Sahih al-Bukhari', en: 'Sahih al-Bukhari' },
-  muslim: { fr: 'Sahih Muslim', en: 'Sahih Muslim' },
-  riyadh: { fr: 'Riyad as-Salihin', en: 'Riyad as-Salihin' },
-  nawawi40: { fr: 'Les quarante hadiths d’an-Nawawi', en: 'An-Nawawi’s Forty Hadith' },
-  hisn: { fr: 'La citadelle du musulman (Hisn al-Muslim)', en: 'Fortress of the Muslim (Hisn al-Muslim)' },
-  bulugh: { fr: 'Bulugh al-Maram', en: 'Bulugh al-Maram' },
-  adhkar_nawawi: { fr: 'Al-Adhkar d’an-Nawawi', en: 'Al-Adhkar by an-Nawawi' },
-};
-
 async function seedLibrary(prisma: PrismaClient) {
-  const { pdfBooks, textBooks } = readData<{
-    pdfBooks: { id: string; titleAr: string; authorAr: string; pdfUrl: string; sortOrder: number }[];
-    textBooks: {
+  const { books } = readData<{
+    books: {
       id: string;
       titleAr: string;
+      titleFr: string;
+      titleEn: string;
       authorAr: string;
       description: string;
+      pdfUrl: string | null;
+      pdfSizeMB: number | null;
       isExcerpt: boolean;
+      sortOrder: number;
       chapters: {
         id: string;
         title: string;
@@ -200,41 +192,24 @@ async function seedLibrary(prisma: PrismaClient) {
       }[];
     }[];
   }>('library.json');
-  const texts = new Map(textBooks.map((b) => [b.id, b]));
 
-  for (const pdf of pdfBooks) {
-    const id = PDF_TO_TEXT_ID[pdf.id] ?? pdf.id;
-    const text = texts.get(id);
-    const titles = TITLES[id];
-    if (!text || !titles) throw new Error(`No text/titles for book ${id}`);
-    const book = {
-      titleAr: pdf.titleAr,
-      titleFr: titles.fr,
-      titleEn: titles.en,
-      authorAr: text.authorAr,
-      description: text.description,
-      format: 'pdf' as const,
-      pdfUrl: BROKEN_PDF_IDS.has(pdf.id) ? null : pdf.pdfUrl,
-      isExcerpt: text.isExcerpt,
-      sortOrder: pdf.sortOrder,
-    };
-    await prisma.book.upsert({ where: { id }, create: { id, ...book }, update: book });
-    for (const { entries, ...chapter } of text.chapters) {
-      const chapterData = { ...chapter, bookId: id };
+  for (const { chapters, pdfSizeMB, ...book } of books) {
+    const data = { ...book, pdfSizeMb: pdfSizeMB, format: 'pdf' as const };
+    await prisma.book.upsert({ where: { id: book.id }, create: data, update: data });
+    for (const { entries, ...chapter } of chapters) {
+      const chapterData = { ...chapter, bookId: book.id };
       await prisma.bookChapter.upsert({ where: { id: chapter.id }, create: chapterData, update: chapterData });
       for (const entry of entries) {
         const entryData = { ...entry, chapterId: chapter.id };
         await prisma.bookEntry.upsert({ where: { id: entry.id }, create: entryData, update: entryData });
       }
     }
-    texts.delete(id);
   }
-  if (texts.size > 0) throw new Error(`Text books without catalogue entry: ${[...texts.keys()].join(', ')}`);
-  console.warn(`library: ${pdfBooks.length} books`);
+  console.warn(`library: ${books.length} books`);
 }
 
 async function seedDonations(prisma: PrismaClient) {
-  const data = readData<{
+  const data = readSeed<{
     presets: number[];
     causes: {
       slug: string;

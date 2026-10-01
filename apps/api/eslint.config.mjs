@@ -13,6 +13,11 @@ export default [
     },
   },
   {
+    // Command-line tools print their results.
+    files: ['scripts/**'],
+    rules: { 'no-console': 'off' },
+  },
+  {
     // Jest configuration and setup files are CommonJS.
     files: ['**/*.js'],
     languageOptions: { sourceType: 'commonjs' },

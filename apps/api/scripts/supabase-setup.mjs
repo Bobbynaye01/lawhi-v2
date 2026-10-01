@@ -140,4 +140,4 @@ const ok =
   !bucket.public &&
   (before ? counts.donations >= before.d : true);
 console.log(ok ? 'SUPABASE PRÊT' : 'VÉRIFICATION EN ÉCHEC');
-process.exit(ok ? 0 : 1);
+process.exitCode = ok ? 0 : 1;

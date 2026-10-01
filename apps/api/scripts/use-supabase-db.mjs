@@ -25,7 +25,7 @@ if (!password) {
   process.exit(1);
 }
 
-const url = `postgresql://postgres.${ref}:${encodeURIComponent(password)}@${POOLER_HOST}:5432/postgres?schema=public&sslmode=require`;
+const url = `postgresql://postgres.${ref}:${encodeURIComponent(password)}@${POOLER_HOST}:5432/postgres?schema=public&sslmode=require&uselibpqcompat=true`;
 const client = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
 try {
   await client.connect();

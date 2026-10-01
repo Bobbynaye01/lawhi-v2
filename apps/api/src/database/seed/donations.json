@@ -1,81 +1,81 @@
 {
- "source": "Causes listed in the Flutter app (amal_ummah_screen.dart). Goals were hardcoded placeholders and are NOT migrated: an admin sets real goals. Payment methods start disabled without numbers until an admin enters the real ones.",
- "presets": [100, 200, 500, 1000, 5000],
- "causes": [
-  {
-   "slug": "mosque-nouakchott",
-   "titleAr": "مشروع بناء المسجد",
-   "titleFr": "Construction d'une mosquée",
-   "titleEn": "Mosque construction",
-   "descriptionAr": "ساهم في بناء مسجد بنواكشوط — صدقة جارية يجري أجرها بعد وفاتك.",
-   "descriptionFr": "Contribuez à la construction d'une mosquée à Nouakchott — une aumône continue (sadaqa jariya).",
-   "descriptionEn": "Help build a mosque in Nouakchott — an ongoing charity (sadaqa jariya).",
-   "featured": true,
-   "sortOrder": 0
-  },
-  {
-   "slug": "orphan-sponsorship",
-   "titleAr": "كفالة يتيم",
-   "titleFr": "Parrainage d'un orphelin",
-   "titleEn": "Orphan sponsorship",
-   "descriptionAr": "كن سببًا في سعادة طفل يتيم وتعليمه",
-   "descriptionFr": "Contribuez au bien-être et à l'éducation d'un enfant orphelin.",
-   "descriptionEn": "Support the well-being and education of an orphaned child.",
-   "featured": false,
-   "sortOrder": 1
-  },
-  {
-   "slug": "feed-the-needy",
-   "titleAr": "إطعام مسكين",
-   "titleFr": "Nourrir un nécessiteux",
-   "titleEn": "Feed the needy",
-   "descriptionAr": "وجبة دافئة لعائلة محتاجة كل يوم",
-   "descriptionFr": "Un repas chaud pour une famille dans le besoin.",
-   "descriptionEn": "A warm meal for a family in need.",
-   "featured": false,
-   "sortOrder": 2
-  },
-  {
-   "slug": "quran-teaching",
-   "titleAr": "تعليم قرآن",
-   "titleFr": "Enseignement du Coran",
-   "titleEn": "Quran teaching",
-   "descriptionAr": "ساعد في تحفيظ كتاب الله للأطفال",
-   "descriptionFr": "Aidez des enfants à apprendre le Coran par cœur.",
-   "descriptionEn": "Help children memorise the Quran.",
-   "featured": false,
-   "sortOrder": 3
-  },
-  {
-   "slug": "patient-care",
-   "titleAr": "علاج مريض",
-   "titleFr": "Soins d'un malade",
-   "titleEn": "Patient care",
-   "descriptionAr": "أسهم في علاج من لا يستطيع الدفع",
-   "descriptionFr": "Participez aux soins de malades qui ne peuvent pas payer.",
-   "descriptionEn": "Help treat patients who cannot afford care.",
-   "featured": false,
-   "sortOrder": 4
-  },
-  {
-   "slug": "zakat-fund",
-   "titleAr": "صندوق الزكاة",
-   "titleFr": "Fonds de la zakat",
-   "titleEn": "Zakat fund",
-   "descriptionAr": "أخرج زكاتك وطهّر مالك",
-   "descriptionFr": "Versez votre zakat et purifiez vos biens.",
-   "descriptionEn": "Pay your zakat and purify your wealth.",
-   "featured": false,
-   "sortOrder": 5
-  }
- ],
- "paymentMethods": [
-  { "operator": "bankily", "name": "Bankily", "sortOrder": 0 },
-  { "operator": "masrivi", "name": "Masrivi", "sortOrder": 1 },
-  { "operator": "bimbank", "name": "Bimbank", "sortOrder": 2 },
-  { "operator": "click", "name": "Click", "sortOrder": 3 },
-  { "operator": "sedad", "name": "Sedad", "sortOrder": 4 },
-  { "operator": "bamis_digital", "name": "Bamis Digital", "sortOrder": 5 },
-  { "operator": "bci_pay", "name": "BCI Pay", "sortOrder": 6 }
- ]
+  "source": "Causes listed in the Flutter app (amal_ummah_screen.dart). Goals were hardcoded placeholders and are NOT migrated: an admin sets real goals. Payment methods start disabled without numbers until an admin enters the real ones.",
+  "presets": [100, 200, 500, 1000, 5000],
+  "causes": [
+    {
+      "slug": "mosque-nouakchott",
+      "titleAr": "مشروع بناء المسجد",
+      "titleFr": "Construction d'une mosquée",
+      "titleEn": "Mosque construction",
+      "descriptionAr": "ساهم في بناء مسجد بنواكشوط — صدقة جارية يجري أجرها بعد وفاتك.",
+      "descriptionFr": "Contribuez à la construction d'une mosquée à Nouakchott — une aumône continue (sadaqa jariya).",
+      "descriptionEn": "Help build a mosque in Nouakchott — an ongoing charity (sadaqa jariya).",
+      "featured": true,
+      "sortOrder": 0
+    },
+    {
+      "slug": "orphan-sponsorship",
+      "titleAr": "كفالة يتيم",
+      "titleFr": "Parrainage d'un orphelin",
+      "titleEn": "Orphan sponsorship",
+      "descriptionAr": "كن سببًا في سعادة طفل يتيم وتعليمه",
+      "descriptionFr": "Contribuez au bien-être et à l'éducation d'un enfant orphelin.",
+      "descriptionEn": "Support the well-being and education of an orphaned child.",
+      "featured": false,
+      "sortOrder": 1
+    },
+    {
+      "slug": "feed-the-needy",
+      "titleAr": "إطعام مسكين",
+      "titleFr": "Nourrir un nécessiteux",
+      "titleEn": "Feed the needy",
+      "descriptionAr": "وجبة دافئة لعائلة محتاجة كل يوم",
+      "descriptionFr": "Un repas chaud pour une famille dans le besoin.",
+      "descriptionEn": "A warm meal for a family in need.",
+      "featured": false,
+      "sortOrder": 2
+    },
+    {
+      "slug": "quran-teaching",
+      "titleAr": "تعليم قرآن",
+      "titleFr": "Enseignement du Coran",
+      "titleEn": "Quran teaching",
+      "descriptionAr": "ساعد في تحفيظ كتاب الله للأطفال",
+      "descriptionFr": "Aidez des enfants à apprendre le Coran par cœur.",
+      "descriptionEn": "Help children memorise the Quran.",
+      "featured": false,
+      "sortOrder": 3
+    },
+    {
+      "slug": "patient-care",
+      "titleAr": "علاج مريض",
+      "titleFr": "Soins d'un malade",
+      "titleEn": "Patient care",
+      "descriptionAr": "أسهم في علاج من لا يستطيع الدفع",
+      "descriptionFr": "Participez aux soins de malades qui ne peuvent pas payer.",
+      "descriptionEn": "Help treat patients who cannot afford care.",
+      "featured": false,
+      "sortOrder": 4
+    },
+    {
+      "slug": "zakat-fund",
+      "titleAr": "صندوق الزكاة",
+      "titleFr": "Fonds de la zakat",
+      "titleEn": "Zakat fund",
+      "descriptionAr": "أخرج زكاتك وطهّر مالك",
+      "descriptionFr": "Versez votre zakat et purifiez vos biens.",
+      "descriptionEn": "Pay your zakat and purify your wealth.",
+      "featured": false,
+      "sortOrder": 5
+    }
+  ],
+  "paymentMethods": [
+    { "operator": "bankily", "name": "Bankily", "sortOrder": 0 },
+    { "operator": "masrivi", "name": "Masrivi", "sortOrder": 1 },
+    { "operator": "bimbank", "name": "Bimbank", "sortOrder": 2 },
+    { "operator": "click", "name": "Click", "sortOrder": 3 },
+    { "operator": "sedad", "name": "Sedad", "sortOrder": 4 },
+    { "operator": "bamis_digital", "name": "Bamis Digital", "sortOrder": 5 },
+    { "operator": "bci_pay", "name": "BCI Pay", "sortOrder": 6 }
+  ]
 }

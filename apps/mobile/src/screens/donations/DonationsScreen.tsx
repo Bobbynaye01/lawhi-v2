@@ -3,7 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { AppText, Button, Card, LoadingState, MessageState, Notice, Screen } from '../../components/ui';
+import {
+  AppText,
+  Button,
+  Card,
+  LoadingState,
+  MessageState,
+  Notice,
+  Screen,
+} from '../../components/ui';
 import { MIN_TOUCH, radius, spacing } from '../../constants/theme';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
@@ -24,7 +32,9 @@ export function DonationsScreen({ navigation }: RootScreenProps<'Donations'>) {
         <Pressable
           accessibilityRole="button"
           onPress={() =>
-            auth.session ? navigation.navigate('MyDonations') : navigation.navigate('SignIn', { redirect: 'MyDonations' })
+            auth.session
+              ? navigation.navigate('MyDonations')
+              : navigation.navigate('SignIn', { redirect: 'MyDonations' })
           }
           style={{ minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: spacing.sm }}
         >
@@ -58,23 +68,42 @@ export function DonationsScreen({ navigation }: RootScreenProps<'Donations'>) {
       {causes.isError ? <Notice tone="warning">{t('common.showingCachedData')}</Notice> : null}
       {causes.data.length === 0 ? <MessageState title={t('donations.noCauses')} /> : null}
       {causes.data.map((cause) => {
-        const progress = cause.goalAmount ? Math.min(1, cause.confirmedAmount / cause.goalAmount) : null;
+        const progress = cause.goalAmount
+          ? Math.min(1, cause.confirmedAmount / cause.goalAmount)
+          : null;
         return (
-          <Card key={cause.id} style={cause.featured ? { borderColor: theme.accent, borderWidth: 2 } : undefined}>
-            {cause.featured ? <AppText variant="small" style={{ color: theme.accent }}>{t('donations.featured')}</AppText> : null}
+          <Card
+            key={cause.id}
+            style={cause.featured ? { borderColor: theme.accent, borderWidth: 2 } : undefined}
+          >
+            {cause.featured ? (
+              <AppText variant="small" style={{ color: theme.accent }}>
+                {t('donations.featured')}
+              </AppText>
+            ) : null}
             <AppText variant="heading">{localized(cause, 'title', locale)}</AppText>
             <AppText variant="muted">{localized(cause, 'description', locale)}</AppText>
             {progress !== null ? (
               <View style={{ gap: spacing.xs }}>
                 <View style={[styles.track, { backgroundColor: theme.border }]}>
-                  <View style={[styles.fill, { backgroundColor: theme.success, width: `${progress * 100}%` }]} />
+                  <View
+                    style={[
+                      styles.fill,
+                      { backgroundColor: theme.success, width: `${progress * 100}%` },
+                    ]}
+                  />
                 </View>
                 <AppText variant="small">
-                  {t('donations.collectedOfGoal', { collected: formatMRU(cause.confirmedAmount), goal: formatMRU(cause.goalAmount!) })}
+                  {t('donations.collectedOfGoal', {
+                    collected: formatMRU(cause.confirmedAmount),
+                    goal: formatMRU(cause.goalAmount!),
+                  })}
                 </AppText>
               </View>
             ) : (
-              <AppText variant="small">{t('donations.collected', { collected: formatMRU(cause.confirmedAmount) })}</AppText>
+              <AppText variant="small">
+                {t('donations.collected', { collected: formatMRU(cause.confirmedAmount) })}
+              </AppText>
             )}
             <AppText variant="small">{t('donations.confirmedOnly')}</AppText>
             <Button title={t('donations.donate')} onPress={() => donate(cause.id)} />

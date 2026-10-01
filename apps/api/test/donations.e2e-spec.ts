@@ -16,7 +16,9 @@ describe('Donations', () => {
   beforeAll(async () => {
     ctx = await createTestApp({ rateLimit: false });
     // Fixture: payment methods start as seeded (disabled, no number) in the dedicated test DB.
-    await ctx.prisma.paymentMethod.updateMany({ data: { enabled: false, phoneNumber: null, instructions: null } });
+    await ctx.prisma.paymentMethod.updateMany({
+      data: { enabled: false, phoneNumber: null, instructions: null },
+    });
     donor = `Bearer ${await ctx.token(ctx.newUserId())}`;
     adminId = ctx.newUserId();
     admin = `Bearer ${await ctx.token(adminId)}`;
@@ -24,10 +26,16 @@ describe('Donations', () => {
     // Admin role is granted server-side only (scripts/grant-admin), as here.
     await ctx.prisma.user.update({ where: { id: adminId }, data: { role: 'admin' } });
 
-    const cause = await ctx.prisma.donationCause.findUniqueOrThrow({ where: { slug: 'orphan-sponsorship' } });
+    const cause = await ctx.prisma.donationCause.findUniqueOrThrow({
+      where: { slug: 'orphan-sponsorship' },
+    });
     causeId = cause.id;
-    bankilyId = (await ctx.prisma.paymentMethod.findUniqueOrThrow({ where: { operator: 'bankily' } })).id;
-    masriviId = (await ctx.prisma.paymentMethod.findUniqueOrThrow({ where: { operator: 'masrivi' } })).id;
+    bankilyId = (
+      await ctx.prisma.paymentMethod.findUniqueOrThrow({ where: { operator: 'bankily' } })
+    ).id;
+    masriviId = (
+      await ctx.prisma.paymentMethod.findUniqueOrThrow({ where: { operator: 'masrivi' } })
+    ).id;
   });
   afterAll(async () => {
     await ctx.app.close();
@@ -71,7 +79,10 @@ describe('Donations', () => {
 
   describe('donor flow', () => {
     it('requires authentication', async () => {
-      await api().post('/api/donations').send({ causeId, paymentMethodId: bankilyId, amount: 500 }).expect(401);
+      await api()
+        .post('/api/donations')
+        .send({ causeId, paymentMethodId: bankilyId, amount: 500 })
+        .expect(401);
     });
 
     it('refuses disabled methods, other currencies and invalid amounts', async () => {
@@ -81,16 +92,34 @@ describe('Donations', () => {
         .set('Authorization', donor)
         .send({ ...base, paymentMethodId: masriviId })
         .expect(422);
-      await api().post('/api/donations').set('Authorization', donor).send({ ...base, currency: 'EUR' }).expect(400);
-      await api().post('/api/donations').set('Authorization', donor).send({ ...base, amount: -100 }).expect(400);
-      await api().post('/api/donations').set('Authorization', donor).send({ ...base, amount: 99.5 }).expect(400);
+      await api()
+        .post('/api/donations')
+        .set('Authorization', donor)
+        .send({ ...base, currency: 'EUR' })
+        .expect(400);
+      await api()
+        .post('/api/donations')
+        .set('Authorization', donor)
+        .send({ ...base, amount: -100 })
+        .expect(400);
+      await api()
+        .post('/api/donations')
+        .set('Authorization', donor)
+        .send({ ...base, amount: 99.5 })
+        .expect(400);
     });
 
     it('creates a pending donation in MRU — never reported as paid', async () => {
       const res = await api()
         .post('/api/donations')
         .set('Authorization', donor)
-        .send({ causeId, paymentMethodId: bankilyId, amount: 1000, donorName: 'Mohamed', status: 'confirmed' })
+        .send({
+          causeId,
+          paymentMethodId: bankilyId,
+          amount: 1000,
+          donorName: 'Mohamed',
+          status: 'confirmed',
+        })
         .expect(201);
       expect(res.body).toMatchObject({ amount: 1000, currency: 'MRU', status: 'pending' });
       expect(res.body.code).toMatch(/^LW-[2-9A-Z]{6}$/);
@@ -107,7 +136,10 @@ describe('Donations', () => {
       await api()
         .post(`/api/donations/${id}/proof`)
         .set('Authorization', donor)
-        .attach('file', Buffer.from('<html>not an image</html>'), { filename: 'x.png', contentType: 'image/png' })
+        .attach('file', Buffer.from('<html>not an image</html>'), {
+          filename: 'x.png',
+          contentType: 'image/png',
+        })
         .expect(400);
 
       const withProof = await api()
@@ -132,8 +164,14 @@ describe('Donations', () => {
         .send({ causeId, paymentMethodId: bankilyId, amount: 100 })
         .expect(201);
       const stranger = `Bearer ${await ctx.token(ctx.newUserId())}`;
-      await api().get(`/api/donations/${created.body.id}`).set('Authorization', stranger).expect(404);
-      await api().post(`/api/donations/${created.body.id}/cancel`).set('Authorization', stranger).expect(404);
+      await api()
+        .get(`/api/donations/${created.body.id}`)
+        .set('Authorization', stranger)
+        .expect(404);
+      await api()
+        .post(`/api/donations/${created.body.id}/cancel`)
+        .set('Authorization', stranger)
+        .expect(404);
     });
   });
 
@@ -154,7 +192,11 @@ describe('Donations', () => {
       const initial = total(before.body);
 
       const id = await newDonation(donor, 5000);
-      await api().patch(`/api/admin/donations/${id}/confirm`).set('Authorization', donor).send({}).expect(403);
+      await api()
+        .patch(`/api/admin/donations/${id}/confirm`)
+        .set('Authorization', donor)
+        .send({})
+        .expect(403);
       expect(total((await api().get('/api/donations/causes')).body)).toBe(initial);
 
       const confirmed = await api()
@@ -171,10 +213,17 @@ describe('Donations', () => {
         .set('Authorization', admin)
         .send({ reason: 'test' })
         .expect(409);
-      await api().patch(`/api/admin/donations/${id}/confirm`).set('Authorization', admin).send({}).expect(409);
+      await api()
+        .patch(`/api/admin/donations/${id}/confirm`)
+        .set('Authorization', admin)
+        .send({})
+        .expect(409);
       await api().post(`/api/donations/${id}/cancel`).set('Authorization', donor).expect(409);
 
-      const detail = await api().get(`/api/admin/donations/${id}`).set('Authorization', admin).expect(200);
+      const detail = await api()
+        .get(`/api/admin/donations/${id}`)
+        .set('Authorization', admin)
+        .expect(200);
       expect(detail.body.events.map((e: { toStatus: string }) => e.toStatus)).toEqual([
         'pending',
         'submitted',
@@ -184,13 +233,20 @@ describe('Donations', () => {
 
     it('requires a reason to reject', async () => {
       const id = await newDonation(donor, 300);
-      await api().patch(`/api/admin/donations/${id}/reject`).set('Authorization', admin).send({}).expect(400);
+      await api()
+        .patch(`/api/admin/donations/${id}/reject`)
+        .set('Authorization', admin)
+        .send({})
+        .expect(400);
       const res = await api()
         .patch(`/api/admin/donations/${id}/reject`)
         .set('Authorization', admin)
         .send({ reason: 'Référence introuvable' })
         .expect(200);
-      expect(res.body).toMatchObject({ status: 'rejected', rejectionReason: 'Référence introuvable' });
+      expect(res.body).toMatchObject({
+        status: 'rejected',
+        rejectionReason: 'Référence introuvable',
+      });
     });
 
     it('forbids an admin from reviewing their own donation', async () => {
@@ -217,9 +273,14 @@ describe('Donations', () => {
         .query({ status: 'confirmed' })
         .set('Authorization', admin)
         .expect(200);
-      expect(confirmed.body.items.every((d: { status: string }) => d.status === 'confirmed')).toBe(true);
+      expect(confirmed.body.items.every((d: { status: string }) => d.status === 'confirmed')).toBe(
+        true,
+      );
 
-      const stats = await api().get('/api/admin/donations/stats').set('Authorization', admin).expect(200);
+      const stats = await api()
+        .get('/api/admin/donations/stats')
+        .set('Authorization', admin)
+        .expect(200);
       expect(stats.body.currency).toBe('MRU');
       expect(stats.body.byStatus.length).toBeGreaterThan(0);
     });
@@ -232,7 +293,10 @@ describe('Donations', () => {
         .attach('file', PNG, { filename: 'recu.png', contentType: 'image/png' })
         .expect(201);
       await api().get(`/api/admin/donations/${id}/proof`).set('Authorization', donor).expect(403);
-      const proof = await api().get(`/api/admin/donations/${id}/proof`).set('Authorization', admin).expect(200);
+      const proof = await api()
+        .get(`/api/admin/donations/${id}/proof`)
+        .set('Authorization', admin)
+        .expect(200);
       expect(proof.headers['content-type']).toBe('image/png');
     });
   });

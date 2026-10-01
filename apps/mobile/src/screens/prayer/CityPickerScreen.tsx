@@ -37,7 +37,10 @@ export function CityPickerScreen({ navigation }: RootScreenProps<'CityPicker'>) 
           placeholderTextColor={theme.textMuted}
           accessibilityLabel={t('prayer.chooseCity')}
           autoFocus
-          style={[styles.input, { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }]}
+          style={[
+            styles.input,
+            { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface },
+          ]}
         />
         {!isApiConfigured ? <Notice tone="warning">{t('errors.api_not_configured')}</Notice> : null}
       </View>
@@ -81,5 +84,11 @@ export function CityPickerScreen({ navigation }: RootScreenProps<'CityPicker'>) 
 
 const styles = StyleSheet.create({
   box: { padding: spacing.lg, gap: spacing.sm },
-  input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontSize: 17 },
+  input: {
+    minHeight: MIN_TOUCH,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    fontSize: 17,
+  },
 });

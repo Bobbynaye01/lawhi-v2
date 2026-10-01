@@ -1,7 +1,13 @@
 import * as Location from 'expo-location';
 
 export type LocationResult =
-  | { status: 'ok'; latitude: number; longitude: number; name: string | null; country: string | null }
+  | {
+      status: 'ok';
+      latitude: number;
+      longitude: number;
+      name: string | null;
+      country: string | null;
+    }
   | { status: 'denied' }
   | { status: 'unavailable' };
 
@@ -12,8 +18,10 @@ export async function getCurrentPlace(): Promise<LocationResult> {
 
   try {
     const position =
-      (await Location.getLastKnownPositionAsync({ maxAge: 10 * 60 * 1000, requiredAccuracy: 5000 })) ??
-      (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
+      (await Location.getLastKnownPositionAsync({
+        maxAge: 10 * 60 * 1000,
+        requiredAccuracy: 5000,
+      })) ?? (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
     const { latitude, longitude } = position.coords;
 
     let name: string | null = null;

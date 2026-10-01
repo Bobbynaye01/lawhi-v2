@@ -42,7 +42,12 @@ export interface Donation {
   hasProof: boolean;
   createdAt: string;
   cause: { id: string; slug: string; titleAr: string; titleFr: string; titleEn: string };
-  paymentMethod: { id: string; name: string; operator: PaymentOperator; phoneNumber: string | null };
+  paymentMethod: {
+    id: string;
+    name: string;
+    operator: PaymentOperator;
+    phoneNumber: string | null;
+  };
 }
 
 export interface CitySearchResult {
@@ -70,13 +75,26 @@ export const api = {
   myDonations: () => apiRequest<Donation[]>('/donations/mine', { auth: true }),
   donation: (id: string) => apiRequest<Donation>(`/donations/${id}`, { auth: true }),
   submitReference: (id: string, reference: string) =>
-    apiRequest<Donation>(`/donations/${id}/reference`, { method: 'POST', body: { reference }, auth: true }),
+    apiRequest<Donation>(`/donations/${id}/reference`, {
+      method: 'POST',
+      body: { reference },
+      auth: true,
+    }),
   uploadProof: (id: string, form: FormData) =>
-    apiRequest<Donation>(`/donations/${id}/proof`, { method: 'POST', form, auth: true, timeoutMs: 60000 }),
-  cancelDonation: (id: string) => apiRequest<Donation>(`/donations/${id}/cancel`, { method: 'POST', auth: true }),
+    apiRequest<Donation>(`/donations/${id}/proof`, {
+      method: 'POST',
+      form,
+      auth: true,
+      timeoutMs: 60000,
+    }),
+  cancelDonation: (id: string) =>
+    apiRequest<Donation>(`/donations/${id}/cancel`, { method: 'POST', auth: true }),
   searchCities: (q: string, lang: Locale) =>
     apiRequest<CitySearchResult[]>(`/prayer/cities?q=${encodeURIComponent(q)}&lang=${lang}`),
   me: () => apiRequest<Me>('/me', { auth: true }),
   deleteAccount: () =>
-    apiRequest<{ deactivated: boolean; authDeleted: boolean }>('/me', { method: 'DELETE', auth: true }),
+    apiRequest<{ deactivated: boolean; authDeleted: boolean }>('/me', {
+      method: 'DELETE',
+      auth: true,
+    }),
 };

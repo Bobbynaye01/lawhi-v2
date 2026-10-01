@@ -13,12 +13,36 @@ export interface ProofStorage {
 }
 
 export class SupabaseProofStorage implements ProofStorage {
+  private bucketReady: Promise<void> | null = null;
+
   constructor(
     private readonly client: SupabaseClient,
     private readonly bucket: string,
   ) {}
 
+  /** Creates the private bucket on first use if it does not exist yet. */
+  private ensureBucket(): Promise<void> {
+    this.bucketReady ??= (async () => {
+      const existing = await this.client.storage.getBucket(this.bucket);
+      if (existing.data) {
+        if (existing.data.public) throw new Error(`Bucket ${this.bucket} must be private`);
+        return;
+      }
+      const { error } = await this.client.storage.createBucket(this.bucket, {
+        public: false,
+        fileSizeLimit: 5 * 1024 * 1024,
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+      });
+      if (error) throw new Error(`Cannot create proof bucket: ${error.message}`);
+    })().catch((error: unknown) => {
+      this.bucketReady = null; // retry on next upload
+      throw error;
+    });
+    return this.bucketReady;
+  }
+
   async save(path: string, content: Buffer, contentType: string): Promise<void> {
+    await this.ensureBucket();
     const { error } = await this.client.storage
       .from(this.bucket)
       .upload(path, content, { contentType, upsert: false });

@@ -44,7 +44,9 @@ async function seedQuran(prisma: PrismaClient) {
     await prisma.surah.upsert({ where: { id: surah.id }, create: surah, update: surah });
   }
 
-  const manifest = quranData<{ hafs: { sha256: string }; warsh: { sha256: string } }>('manifest.json');
+  const manifest = quranData<{ hafs: { sha256: string }; warsh: { sha256: string } }>(
+    'manifest.json',
+  );
   const version = `${manifest.hafs.sha256}:${manifest.warsh.sha256}`;
   const current = await prisma.appConfig.findUnique({ where: { key: 'quran.dataVersion' } });
   if (current?.value === version) {
@@ -161,7 +163,11 @@ async function seedAdhkar(prisma: PrismaClient) {
   }>('adhkar.json');
   let count = 0;
   for (const { items, ...category } of categories) {
-    await prisma.dhikrCategory.upsert({ where: { id: category.id }, create: category, update: category });
+    await prisma.dhikrCategory.upsert({
+      where: { id: category.id },
+      create: category,
+      update: category,
+    });
     for (const item of items) {
       const data = { ...item, categoryId: category.id };
       await prisma.dhikr.upsert({ where: { id: item.id }, create: data, update: data });
@@ -188,7 +194,13 @@ async function seedLibrary(prisma: PrismaClient) {
         id: string;
         title: string;
         sortOrder: number;
-        entries: { id: string; number: number; text: string; narrator: string | null; reference: string | null }[];
+        entries: {
+          id: string;
+          number: number;
+          text: string;
+          narrator: string | null;
+          reference: string | null;
+        }[];
       }[];
     }[];
   }>('library.json');
@@ -198,10 +210,18 @@ async function seedLibrary(prisma: PrismaClient) {
     await prisma.book.upsert({ where: { id: book.id }, create: data, update: data });
     for (const { entries, ...chapter } of chapters) {
       const chapterData = { ...chapter, bookId: book.id };
-      await prisma.bookChapter.upsert({ where: { id: chapter.id }, create: chapterData, update: chapterData });
+      await prisma.bookChapter.upsert({
+        where: { id: chapter.id },
+        create: chapterData,
+        update: chapterData,
+      });
       for (const entry of entries) {
         const entryData = { ...entry, chapterId: chapter.id };
-        await prisma.bookEntry.upsert({ where: { id: entry.id }, create: entryData, update: entryData });
+        await prisma.bookEntry.upsert({
+          where: { id: entry.id },
+          create: entryData,
+          update: entryData,
+        });
       }
     }
   }
@@ -240,7 +260,9 @@ async function seedDonations(prisma: PrismaClient) {
     create: { key: 'donation.presets', value: data.presets },
     update: {},
   });
-  console.warn(`donations: ${data.paymentMethods.length} methods (disabled until configured), ${data.causes.length} causes`);
+  console.warn(
+    `donations: ${data.paymentMethods.length} methods (disabled until configured), ${data.causes.length} causes`,
+  );
 }
 
 async function main() {

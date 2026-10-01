@@ -1,4 +1,10 @@
-import { PRAYERS, type Madhab, type NotificationMode, type Prayer, type PrayerMethodId } from './prayer';
+import {
+  PRAYERS,
+  type Madhab,
+  type NotificationMode,
+  type Prayer,
+  type PrayerMethodId,
+} from './prayer';
 import { computePrayerDays, type PrayerDay } from './prayer-times';
 
 /** iOS keeps at most 64 pending local notifications per app; 12 days × 5 prayers stays below. */
@@ -25,7 +31,9 @@ export interface PlannedNotification {
 }
 
 /** Short stable fingerprint of everything that changes the times or the sound. */
-export function scheduleFingerprint(input: Pick<ScheduleInput, 'latitude' | 'longitude' | 'method' | 'madhab' | 'mode'>): string {
+export function scheduleFingerprint(
+  input: Pick<ScheduleInput, 'latitude' | 'longitude' | 'method' | 'madhab' | 'mode'>,
+): string {
   const raw = `${input.latitude.toFixed(3)}|${input.longitude.toFixed(3)}|${input.method}|${input.madhab}|${input.mode}`;
   let hash = 5381;
   for (let i = 0; i < raw.length; i++) hash = ((hash << 5) + hash + raw.charCodeAt(i)) >>> 0;

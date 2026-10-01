@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createDonationSchema } from '@lawhi/shared';
@@ -74,7 +66,10 @@ export class DonationsController {
   }
 
   @Post(':id/cancel')
-  cancel(@CurrentUser() user: AuthUser, @Param('id', new ZodValidationPipe(uuidSchema)) id: string) {
+  cancel(
+    @CurrentUser() user: AuthUser,
+    @Param('id', new ZodValidationPipe(uuidSchema)) id: string,
+  ) {
     return this.donations.cancel(user.id, id);
   }
 }

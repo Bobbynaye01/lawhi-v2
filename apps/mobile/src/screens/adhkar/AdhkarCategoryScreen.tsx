@@ -25,7 +25,10 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
   const { increment, resetCategory, toggleFavorite } = useAdhkarStore.getState();
 
   useLayoutEffect(() => {
-    if (category) navigation.setOptions({ title: locale === 'ar' ? category.titleAr : localized(category, 'title', locale) });
+    if (category)
+      navigation.setOptions({
+        title: locale === 'ar' ? category.titleAr : localized(category, 'title', locale),
+      });
   }, [navigation, category, locale]);
 
   if (!category) return <MessageState title={t('errors.not_found')} />;
@@ -37,7 +40,9 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
   return (
     <Screen scroll={false}>
       <View style={styles.progress}>
-        <AppText accessibilityLiveRegion="polite">{t('adhkar.progress', { done, total: category.items.length })}</AppText>
+        <AppText accessibilityLiveRegion="polite">
+          {t('adhkar.progress', { done, total: category.items.length })}
+        </AppText>
         <Button
           title={t('adhkar.reset')}
           variant="secondary"
@@ -52,11 +57,17 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
           const count = countOf(item.id);
           const complete = count >= item.repetitions;
           const favorite = favorites.includes(item.id);
-          const translation = locale === 'fr' ? item.translationFr : locale === 'en' ? item.translationEn : null;
+          const translation =
+            locale === 'fr' ? item.translationFr : locale === 'en' ? item.translationEn : null;
           return (
             <Card style={complete ? { borderColor: theme.success } : undefined}>
               {item.title ? <AppText variant="heading">{item.title}</AppText> : null}
-              <AppText style={[styles.arabic, { color: theme.quranText, fontSize: 22 * fontScale, lineHeight: 42 * fontScale }]}>
+              <AppText
+                style={[
+                  styles.arabic,
+                  { color: theme.quranText, fontSize: 22 * fontScale, lineHeight: 42 * fontScale },
+                ]}
+              >
                 {item.arabicText}
               </AppText>
               {translation ? <AppText>{translation}</AppText> : null}
@@ -65,11 +76,17 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
               <View style={styles.footer}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={favorite ? t('adhkar.removeFavorite') : t('adhkar.addFavorite')}
+                  accessibilityLabel={
+                    favorite ? t('adhkar.removeFavorite') : t('adhkar.addFavorite')
+                  }
                   onPress={() => toggleFavorite(item.id)}
                   style={styles.icon}
                 >
-                  <Ionicons name={favorite ? 'star' : 'star-outline'} size={22} color={theme.accent} />
+                  <Ionicons
+                    name={favorite ? 'star' : 'star-outline'}
+                    size={22}
+                    color={theme.accent}
+                  />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
@@ -79,10 +96,15 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
                   onPress={() => {
                     const next = increment(item.id, item.repetitions);
                     void Haptics.impactAsync(
-                      next >= item.repetitions ? Haptics.ImpactFeedbackStyle.Heavy : Haptics.ImpactFeedbackStyle.Light,
+                      next >= item.repetitions
+                        ? Haptics.ImpactFeedbackStyle.Heavy
+                        : Haptics.ImpactFeedbackStyle.Light,
                     ).catch(() => undefined);
                   }}
-                  style={[styles.counter, { backgroundColor: complete ? theme.success : theme.primary }]}
+                  style={[
+                    styles.counter,
+                    { backgroundColor: complete ? theme.success : theme.primary },
+                  ]}
                 >
                   <AppText style={{ color: theme.onPrimary, fontWeight: '700', fontSize: 18 }}>
                     {complete ? '✓' : `${count} / ${item.repetitions}`}
@@ -106,7 +128,23 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   arabic: { fontFamily: fonts.arabic, textAlign: 'right', writingDirection: 'rtl' },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.sm },
-  icon: { minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
-  counter: { minWidth: 110, minHeight: MIN_TOUCH + 4, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
+  icon: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counter: {
+    minWidth: 110,
+    minHeight: MIN_TOUCH + 4,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

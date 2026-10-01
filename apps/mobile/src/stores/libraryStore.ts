@@ -26,7 +26,8 @@ export const useLibraryStore = create<LibraryState>()(
       downloads: {},
       pdfPages: {},
       lastChapter: {},
-      setDownloaded: (bookId, info) => set((s) => ({ downloads: { ...s.downloads, [bookId]: info } })),
+      setDownloaded: (bookId, info) =>
+        set((s) => ({ downloads: { ...s.downloads, [bookId]: info } })),
       removeDownload: (bookId) =>
         set((s) => {
           const downloads = { ...s.downloads };

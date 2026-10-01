@@ -7,7 +7,7 @@ import {
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { config } from '../constants/config';
-import i18n from '../i18n';
+import { i18n } from '../i18n';
 import { useLocationStore } from '../stores/locationStore';
 import { useSettingsStore } from '../stores/settingsStore';
 
@@ -15,16 +15,19 @@ const CHANNEL_SILENT_SOUND = 'prayer-default';
 const CHANNEL_ADHAN = 'prayer-adhan';
 const PRAYER_PREFIX = 'prayer:';
 
-export type SyncResult = 'scheduled' | 'disabled' | 'no-location' | 'permission-denied' | 'unsupported';
+export type SyncResult =
+  'scheduled' | 'disabled' | 'no-location' | 'permission-denied' | 'unsupported';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 async function ensureChannels() {
   if (Platform.OS !== 'android') return;
@@ -60,7 +63,9 @@ export function effectiveMode(mode: NotificationMode): NotificationMode {
  * Brings scheduled prayer notifications in line with the current settings and
  * place. Safe to call often: only differences are applied.
  */
-export async function syncPrayerNotifications(options: { askPermission?: boolean } = {}): Promise<SyncResult> {
+export async function syncPrayerNotifications(
+  options: { askPermission?: boolean } = {},
+): Promise<SyncResult> {
   if (Platform.OS === 'web') return 'unsupported';
 
   const { prayerMethod, madhab, notificationMode } = useSettingsStore.getState();
@@ -82,6 +87,7 @@ export async function syncPrayerNotifications(options: { askPermission?: boolean
 
   await ensureChannels();
   const now = new Date();
+  // The language is part of the id: switching language reschedules the texts.
   const plan = planPrayerNotifications({
     latitude: place.latitude,
     longitude: place.longitude,
@@ -90,7 +96,7 @@ export async function syncPrayerNotifications(options: { askPermission?: boolean
     mode,
     today: localDateString(now),
     now,
-  });
+  }).map((p) => ({ ...p, id: `${p.id}:${i18n.language}` }));
   const { toCancel, toSchedule } = diffSchedule(existing, plan);
 
   await Promise.all(toCancel.map((id) => Notifications.cancelScheduledNotificationAsync(id)));

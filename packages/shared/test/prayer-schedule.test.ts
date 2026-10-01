@@ -27,7 +27,9 @@ describe('planPrayerNotifications', () => {
   });
 
   it('plans nothing when notifications are off', () => {
-    expect(planPrayerNotifications({ ...base, mode: 'off', today: '2026-10-01', now: new Date() })).toEqual([]);
+    expect(
+      planPrayerNotifications({ ...base, mode: 'off', today: '2026-10-01', now: new Date() }),
+    ).toEqual([]);
   });
 
   it('gives new ids when the city, method or sound mode changes', () => {
@@ -43,14 +45,29 @@ describe('diffSchedule', () => {
   it('keeps existing notifications, cancels stale ones and adds missing ones — no duplicates', () => {
     const now = new Date('2026-10-01T00:00:00Z');
     const day1 = planPrayerNotifications({ ...base, today: '2026-10-01', now });
-    const nextDay = planPrayerNotifications({ ...base, today: '2026-10-02', now: new Date('2026-10-02T00:00:00Z') });
-    const { toCancel, toSchedule } = diffSchedule(day1.map((p) => p.id), nextDay);
+    const nextDay = planPrayerNotifications({
+      ...base,
+      today: '2026-10-02',
+      now: new Date('2026-10-02T00:00:00Z'),
+    });
+    const { toCancel, toSchedule } = diffSchedule(
+      day1.map((p) => p.id),
+      nextDay,
+    );
     expect(toCancel.every((id) => id.startsWith('prayer:2026-10-01:'))).toBe(true);
     expect(toSchedule.every((p) => p.id.startsWith('prayer:2026-10-13:'))).toBe(true);
     expect(toSchedule).toHaveLength(5);
 
-    const changed = planPrayerNotifications({ ...base, method: 'Egyptian', today: '2026-10-01', now });
-    const resync = diffSchedule(day1.map((p) => p.id), changed);
+    const changed = planPrayerNotifications({
+      ...base,
+      method: 'Egyptian',
+      today: '2026-10-01',
+      now,
+    });
+    const resync = diffSchedule(
+      day1.map((p) => p.id),
+      changed,
+    );
     expect(resync.toCancel).toHaveLength(day1.length);
     expect(resync.toSchedule).toHaveLength(changed.length);
   });

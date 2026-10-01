@@ -1,6 +1,6 @@
 import type { Locale } from '@lawhi/shared';
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
+import { i18n } from '../i18n';
 import { ApiError } from '../services/api/client';
 
 const suffix: Record<Locale, 'Ar' | 'Fr' | 'En'> = { ar: 'Ar', fr: 'Fr', en: 'En' };
@@ -24,11 +24,19 @@ export function intlLocale(locale: Locale): string {
 }
 
 export function formatTime(date: Date, locale: Locale): string {
-  return new Intl.DateTimeFormat(intlLocale(locale), { hour: '2-digit', minute: '2-digit', hour12: false }).format(date);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
 }
 
 export function formatDate(date: Date, locale: Locale): string {
-  return new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(date);
 }
 
 export function formatDateTime(iso: string, locale: Locale): string {

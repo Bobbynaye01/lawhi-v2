@@ -21,10 +21,14 @@ export function QiblaScreen({ navigation }: TabScreenProps<'Qibla'>) {
   const wasFacing = useRef(false);
 
   const bearing = place ? qiblaBearing(place.latitude, place.longitude) : null;
-  const facing = bearing !== null && heading.status === 'ok' && isFacingQibla(bearing, heading.heading);
+  const facing =
+    bearing !== null && heading.status === 'ok' && isFacingQibla(bearing, heading.heading);
 
   useEffect(() => {
-    if (facing && !wasFacing.current) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    if (facing && !wasFacing.current)
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+        () => undefined,
+      );
     wasFacing.current = facing;
   }, [facing]);
 
@@ -47,7 +51,9 @@ export function QiblaScreen({ navigation }: TabScreenProps<'Qibla'>) {
     if (heading.status !== 'ok') return '';
     if (facing) return t('qibla.facing');
     const rel = Math.round(qiblaRelativeAngle(bearing, heading.heading));
-    return rel <= 180 ? t('qibla.turnRight', { degrees: rel }) : t('qibla.turnLeft', { degrees: 360 - rel });
+    return rel <= 180
+      ? t('qibla.turnRight', { degrees: rel })
+      : t('qibla.turnLeft', { degrees: 360 - rel });
   };
   const distance = Math.round(distanceToKaabaKm(place.latitude, place.longitude));
 
@@ -66,7 +72,10 @@ export function QiblaScreen({ navigation }: TabScreenProps<'Qibla'>) {
             <View
               style={[
                 styles.dial,
-                { borderColor: facing ? theme.success : theme.border, transform: [{ rotate: `${-heading.heading}deg` }] },
+                {
+                  borderColor: facing ? theme.success : theme.border,
+                  transform: [{ rotate: `${-heading.heading}deg` }],
+                },
               ]}
             >
               <AppText style={[styles.north, { color: theme.danger }]}>N</AppText>
@@ -76,7 +85,10 @@ export function QiblaScreen({ navigation }: TabScreenProps<'Qibla'>) {
             </View>
             <View style={[styles.phoneMarker, { backgroundColor: theme.primary }]} />
           </View>
-          <AppText variant="heading" style={{ textAlign: 'center', color: facing ? theme.success : theme.text }}>
+          <AppText
+            variant="heading"
+            style={{ textAlign: 'center', color: facing ? theme.success : theme.text }}
+          >
             {guidance()}
           </AppText>
           {heading.accuracy < 2 ? <Notice tone="warning">{t('qibla.calibrate')}</Notice> : null}
@@ -87,7 +99,11 @@ export function QiblaScreen({ navigation }: TabScreenProps<'Qibla'>) {
       ) : heading.status === 'denied' ? (
         <>
           <Notice tone="warning">{t('qibla.permissionDenied')}</Notice>
-          <Button title={t('common.openSettings')} variant="secondary" onPress={() => void Linking.openSettings()} />
+          <Button
+            title={t('common.openSettings')}
+            variant="secondary"
+            onPress={() => void Linking.openSettings()}
+          />
         </>
       ) : (
         <Notice tone="warning">{t('qibla.noSensor', { degrees: roundedBearing })}</Notice>

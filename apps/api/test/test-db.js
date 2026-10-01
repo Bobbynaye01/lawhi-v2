@@ -6,7 +6,9 @@ const { join } = require('node:path');
 function assertTestDatabase(raw) {
   const name = new URL(raw).pathname.slice(1);
   if (!/_test$/.test(name)) {
-    throw new Error(`Refusing to run e2e tests on database "${name}": its name must end with _test`);
+    throw new Error(
+      `Refusing to run e2e tests on database "${name}": its name must end with _test`,
+    );
   }
   return raw;
 }

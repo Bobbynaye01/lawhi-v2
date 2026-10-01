@@ -12,7 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { lightPalette } from './src/constants/theme';
 import { useIsDark } from './src/hooks/useTheme';
 import { useNotificationSync } from './src/hooks/useNotificationSync';
-import i18n, { detectDeviceLocale, initI18n } from './src/i18n';
+import { detectDeviceLocale, i18n, initI18n } from './src/i18n';
 import { navigationRef, RootNavigator } from './src/navigation/RootNavigator';
 import { handleAuthLink } from './src/services/authLinks';
 import { supabase } from './src/services/supabase';
@@ -70,7 +70,8 @@ function useAuthLinks(ready: boolean) {
   useEffect(() => {
     if (!ready || !supabase) return;
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' && navigationRef.isReady()) navigationRef.navigate('ResetPassword');
+      if (event === 'PASSWORD_RECOVERY' && navigationRef.isReady())
+        navigationRef.navigate('ResetPassword');
     });
     return () => data.subscription.unsubscribe();
   }, [ready]);
@@ -95,7 +96,14 @@ export default function App() {
 
   if (!fontsLoaded || !hydrated || !i18n.isInitialized) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: lightPalette.background }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: lightPalette.background,
+        }}
+      >
         <ActivityIndicator color={lightPalette.primary} size="large" />
       </View>
     );

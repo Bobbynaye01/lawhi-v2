@@ -1,5 +1,10 @@
 import type { VerseRef } from '@lawhi/shared';
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer, type AudioStatus } from 'expo-audio';
+import {
+  createAudioPlayer,
+  setAudioModeAsync,
+  type AudioPlayer,
+  type AudioStatus,
+} from 'expo-audio';
 import { create } from 'zustand';
 import type { Reciter } from '../../repositories/contentRepository';
 import { cachedAudioUri } from './audioCache';
@@ -66,7 +71,9 @@ async function ensureAudioMode() {
 
 function prefetch(reciter: Reciter, queue: VerseRef[], from: number) {
   for (const ref of queue.slice(from + 1, from + 1 + PREFETCH_AHEAD)) {
-    cachedAudioUri(verseAudioUrl(reciter, ref), verseAudioFileName(reciter, ref)).catch(() => undefined);
+    cachedAudioUri(verseAudioUrl(reciter, ref), verseAudioFileName(reciter, ref)).catch(
+      () => undefined,
+    );
   }
 }
 
@@ -146,6 +153,13 @@ export const recitation = {
       player.pause();
       player.clearLockScreenControls();
     }
-    useRecitationStore.setState({ queue: [], index: 0, status: 'idle', error: null, position: 0, duration: 0 });
+    useRecitationStore.setState({
+      queue: [],
+      index: 0,
+      status: 'idle',
+      error: null,
+      position: 0,
+      duration: 0,
+    });
   },
 };

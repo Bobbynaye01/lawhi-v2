@@ -13,7 +13,8 @@ const MIN_PASSWORD = 8;
 function authErrorKey(message: string): string {
   const m = message.toLowerCase();
   if (m.includes('invalid login')) return 'auth.errors.invalidCredentials';
-  if (m.includes('already registered') || m.includes('already been registered')) return 'auth.errors.emailTaken';
+  if (m.includes('already registered') || m.includes('already been registered'))
+    return 'auth.errors.emailTaken';
   if (m.includes('email not confirmed')) return 'auth.errors.emailNotConfirmed';
   if (m.includes('rate limit') || m.includes('too many')) return 'auth.errors.rateLimited';
   if (m.includes('network') || m.includes('fetch')) return 'errors.network_error';
@@ -45,7 +46,10 @@ export function SignInScreen({ navigation, route }: RootScreenProps<'SignIn'>) {
       return;
     }
     setLoading(true);
-    const { error: authError } = await client.auth.signInWithPassword({ email: email.trim(), password });
+    const { error: authError } = await client.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
     setLoading(false);
     if (authError) {
       setError(t(authErrorKey(authError.message)));
@@ -59,12 +63,35 @@ export function SignInScreen({ navigation, route }: RootScreenProps<'SignIn'>) {
   return (
     <Screen>
       <AppText variant="muted">{t('auth.signInIntro')}</AppText>
-      <FormField label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" />
-      <FormField label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="password" textContentType="password" />
+      <FormField
+        label={t('auth.email')}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        autoComplete="email"
+        textContentType="emailAddress"
+      />
+      <FormField
+        label={t('auth.password')}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoComplete="password"
+        textContentType="password"
+      />
       {error ? <Notice tone="warning">{error}</Notice> : null}
       <Button title={t('auth.signIn')} loading={loading} onPress={() => void submit()} />
-      <Button title={t('auth.forgotPassword')} variant="secondary" onPress={() => navigation.navigate('ForgotPassword')} />
-      <Button title={t('auth.createAccount')} variant="secondary" onPress={() => navigation.navigate('SignUp')} />
+      <Button
+        title={t('auth.forgotPassword')}
+        variant="secondary"
+        onPress={() => navigation.navigate('ForgotPassword')}
+      />
+      <Button
+        title={t('auth.createAccount')}
+        variant="secondary"
+        onPress={() => navigation.navigate('SignUp')}
+      />
     </Screen>
   );
 }
@@ -83,7 +110,8 @@ export function SignUpScreen({ navigation }: RootScreenProps<'SignUp'>) {
   const submit = async () => {
     setError(null);
     if (!EMAIL.test(email.trim())) return setError(t('auth.errors.invalidEmail'));
-    if (password.length < MIN_PASSWORD) return setError(t('auth.errors.passwordTooShort', { min: MIN_PASSWORD }));
+    if (password.length < MIN_PASSWORD)
+      return setError(t('auth.errors.passwordTooShort', { min: MIN_PASSWORD }));
     if (password !== confirm) return setError(t('auth.errors.passwordMismatch'));
     setLoading(true);
     const { data, error: authError } = await client.auth.signUp({
@@ -109,7 +137,14 @@ export function SignUpScreen({ navigation }: RootScreenProps<'SignUp'>) {
 
   return (
     <Screen>
-      <FormField label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
+      <FormField
+        label={t('auth.email')}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        autoComplete="email"
+      />
       <FormField
         label={t('auth.password')}
         value={password}
@@ -118,7 +153,13 @@ export function SignUpScreen({ navigation }: RootScreenProps<'SignUp'>) {
         autoComplete="new-password"
         hint={t('auth.passwordHint', { min: MIN_PASSWORD })}
       />
-      <FormField label={t('auth.confirmPassword')} value={confirm} onChangeText={setConfirm} secureTextEntry autoComplete="new-password" />
+      <FormField
+        label={t('auth.confirmPassword')}
+        value={confirm}
+        onChangeText={setConfirm}
+        secureTextEntry
+        autoComplete="new-password"
+      />
       {error ? <Notice tone="warning">{error}</Notice> : null}
       <Button title={t('auth.createAccount')} loading={loading} onPress={() => void submit()} />
     </Screen>
@@ -156,7 +197,13 @@ export function ForgotPasswordScreen() {
       ) : (
         <>
           <AppText variant="muted">{t('auth.resetIntro')}</AppText>
-          <FormField label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+          <FormField
+            label={t('auth.email')}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
           {error ? <Notice tone="warning">{error}</Notice> : null}
           <Button title={t('auth.sendResetLink')} loading={loading} onPress={() => void submit()} />
         </>
@@ -178,7 +225,8 @@ export function ResetPasswordScreen({ navigation }: RootScreenProps<'ResetPasswo
 
   const submit = async () => {
     setError(null);
-    if (password.length < MIN_PASSWORD) return setError(t('auth.errors.passwordTooShort', { min: MIN_PASSWORD }));
+    if (password.length < MIN_PASSWORD)
+      return setError(t('auth.errors.passwordTooShort', { min: MIN_PASSWORD }));
     if (password !== confirm) return setError(t('auth.errors.passwordMismatch'));
     setLoading(true);
     const { error: authError } = await client.auth.updateUser({ password });
@@ -207,7 +255,13 @@ export function ResetPasswordScreen({ navigation }: RootScreenProps<'ResetPasswo
         autoComplete="new-password"
         hint={t('auth.passwordHint', { min: MIN_PASSWORD })}
       />
-      <FormField label={t('auth.confirmPassword')} value={confirm} onChangeText={setConfirm} secureTextEntry autoComplete="new-password" />
+      <FormField
+        label={t('auth.confirmPassword')}
+        value={confirm}
+        onChangeText={setConfirm}
+        secureTextEntry
+        autoComplete="new-password"
+      />
       {error ? <Notice tone="warning">{error}</Notice> : null}
       <Button title={t('auth.savePassword')} loading={loading} onPress={() => void submit()} />
     </Screen>

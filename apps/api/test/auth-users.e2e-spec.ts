@@ -30,17 +30,30 @@ describe('Authentication & account', () => {
     const id = ctx.newUserId();
     const res = await api()
       .get('/api/me')
-      .set('Authorization', `Bearer ${await ctx.token(id, `Fatimetou.${id.slice(0, 6)}@Example.MR`)}`)
+      .set(
+        'Authorization',
+        `Bearer ${await ctx.token(id, `Fatimetou.${id.slice(0, 6)}@Example.MR`)}`,
+      )
       .expect(200);
-    expect(res.body).toMatchObject({ id, email: `fatimetou.${id.slice(0, 6)}@example.mr`, role: 'user' });
+    expect(res.body).toMatchObject({
+      id,
+      email: `fatimetou.${id.slice(0, 6)}@example.mr`,
+      role: 'user',
+    });
   });
 
   it('hands an email over to a new Supabase identity (account recreated outside the API)', async () => {
     const email = `reused.${ctx.newUserId().slice(0, 6)}@example.mr`;
     const oldId = ctx.newUserId();
     const newId = ctx.newUserId();
-    await api().get('/api/me').set('Authorization', `Bearer ${await ctx.token(oldId, email)}`).expect(200);
-    const res = await api().get('/api/me').set('Authorization', `Bearer ${await ctx.token(newId, email)}`).expect(200);
+    await api()
+      .get('/api/me')
+      .set('Authorization', `Bearer ${await ctx.token(oldId, email)}`)
+      .expect(200);
+    const res = await api()
+      .get('/api/me')
+      .set('Authorization', `Bearer ${await ctx.token(newId, email)}`)
+      .expect(200);
     expect(res.body).toMatchObject({ id: newId, email });
     expect((await ctx.prisma.user.findUniqueOrThrow({ where: { id: oldId } })).email).toBeNull();
   });
@@ -59,7 +72,11 @@ describe('Authentication & account', () => {
       .set('Authorization', auth)
       .send({ locale: 'fr', riwaya: 'warsh', prayerMethod: 'Egyptian', notificationMode: 'adhan' })
       .expect(200);
-    await api().put('/api/me/settings').set('Authorization', auth).send({ locale: 'de' }).expect(400);
+    await api()
+      .put('/api/me/settings')
+      .set('Authorization', auth)
+      .send({ locale: 'de' })
+      .expect(400);
 
     await api()
       .put('/api/me/reading-positions/warsh')
@@ -82,8 +99,14 @@ describe('Authentication & account', () => {
     expect(list.body).toHaveLength(1);
 
     const other = `Bearer ${await ctx.token(ctx.newUserId())}`;
-    await api().delete(`/api/me/bookmarks/${bookmark.body.id}`).set('Authorization', other).expect(404);
-    await api().delete(`/api/me/bookmarks/${bookmark.body.id}`).set('Authorization', auth).expect(204);
+    await api()
+      .delete(`/api/me/bookmarks/${bookmark.body.id}`)
+      .set('Authorization', other)
+      .expect(404);
+    await api()
+      .delete(`/api/me/bookmarks/${bookmark.body.id}`)
+      .set('Authorization', auth)
+      .expect(204);
   });
 
   it('rate-limits donation creation before even checking the token', async () => {
@@ -98,7 +121,11 @@ describe('Authentication & account', () => {
   it('deletes an account: data erased, access blocked', async () => {
     const id = ctx.newUserId();
     const auth = `Bearer ${await ctx.token(id)}`;
-    await api().put('/api/me/settings').set('Authorization', auth).send({ locale: 'en' }).expect(200);
+    await api()
+      .put('/api/me/settings')
+      .set('Authorization', auth)
+      .send({ locale: 'en' })
+      .expect(200);
 
     const res = await api().delete('/api/me').set('Authorization', auth).expect(200);
     expect(res.body).toEqual({ deactivated: true, authDeleted: false });

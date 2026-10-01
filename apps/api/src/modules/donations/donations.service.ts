@@ -118,11 +118,21 @@ export class DonationsService {
             select: donorView,
           });
           await tx.donationEvent.create({
-            data: { donationId: donation.id, fromStatus: null, toStatus: 'pending', actorId: userId },
+            data: {
+              donationId: donation.id,
+              fromStatus: null,
+              toStatus: 'pending',
+              actorId: userId,
+            },
           });
           if (status === 'submitted') {
             await tx.donationEvent.create({
-              data: { donationId: donation.id, fromStatus: 'pending', toStatus: 'submitted', actorId: userId },
+              data: {
+                donationId: donation.id,
+                fromStatus: 'pending',
+                toStatus: 'submitted',
+                actorId: userId,
+              },
             });
           }
           return donation;
@@ -149,7 +159,10 @@ export class DonationsService {
   }
 
   async getMine(userId: string, id: string) {
-    const donation = await this.prisma.donation.findFirst({ where: { id, userId }, select: donorView });
+    const donation = await this.prisma.donation.findFirst({
+      where: { id, userId },
+      select: donorView,
+    });
     if (!donation) throw new NotFoundException({ error: 'donation_not_found' });
     const { proofPath, ...rest } = donation;
     return { ...rest, hasProof: proofPath !== null };
@@ -160,8 +173,13 @@ export class DonationsService {
     return this.applyTransition(donation.id, donation.status, 'submitted', userId, { reference });
   }
 
-  async attachProof(userId: string, id: string, file: { buffer: Buffer; size: number } | undefined) {
-    if (!this.storage) throw new ServiceUnavailableException({ error: 'proof_storage_unavailable' });
+  async attachProof(
+    userId: string,
+    id: string,
+    file: { buffer: Buffer; size: number } | undefined,
+  ) {
+    if (!this.storage)
+      throw new ServiceUnavailableException({ error: 'proof_storage_unavailable' });
     if (!file || file.size === 0) throw new BadRequestException({ error: 'proof_missing' });
     if (file.size > MAX_PROOF_BYTES) throw new BadRequestException({ error: 'proof_too_large' });
     const detected = detectProofType(file.buffer);
@@ -170,7 +188,9 @@ export class DonationsService {
     const donation = await this.ownOpenDonation(userId, id);
     const path = `${userId}/${donation.id}/${randomUUID()}.${detected.ext}`;
     await this.storage.save(path, file.buffer, detected.type);
-    return this.applyTransition(donation.id, donation.status, 'submitted', userId, { proofPath: path });
+    return this.applyTransition(donation.id, donation.status, 'submitted', userId, {
+      proofPath: path,
+    });
   }
 
   async cancel(userId: string, id: string) {
@@ -186,7 +206,12 @@ export class DonationsService {
       ...(query.causeId ? { causeId: query.causeId } : {}),
       ...(query.paymentMethodId ? { paymentMethodId: query.paymentMethodId } : {}),
       ...(query.from || query.to
-        ? { createdAt: { ...(query.from ? { gte: query.from } : {}), ...(query.to ? { lte: query.to } : {}) } }
+        ? {
+            createdAt: {
+              ...(query.from ? { gte: query.from } : {}),
+              ...(query.to ? { lte: query.to } : {}),
+            },
+          }
         : {}),
       ...(query.q
         ? {
@@ -226,7 +251,13 @@ export class DonationsService {
         reviewedBy: { select: { id: true, email: true } },
         events: {
           orderBy: { createdAt: 'asc' },
-          select: { fromStatus: true, toStatus: true, note: true, createdAt: true, actor: { select: { email: true } } },
+          select: {
+            fromStatus: true,
+            toStatus: true,
+            note: true,
+            createdAt: true,
+            actor: { select: { email: true } },
+          },
         },
       },
     });
@@ -236,8 +267,12 @@ export class DonationsService {
   }
 
   async adminProof(id: string) {
-    if (!this.storage) throw new ServiceUnavailableException({ error: 'proof_storage_unavailable' });
-    const donation = await this.prisma.donation.findUnique({ where: { id }, select: { proofPath: true } });
+    if (!this.storage)
+      throw new ServiceUnavailableException({ error: 'proof_storage_unavailable' });
+    const donation = await this.prisma.donation.findUnique({
+      where: { id },
+      select: { proofPath: true },
+    });
     if (!donation?.proofPath) throw new NotFoundException({ error: 'proof_not_found' });
     const url = await this.storage.signedUrl(donation.proofPath, 300);
     if (url) return { kind: 'url' as const, url };
@@ -255,11 +290,18 @@ export class DonationsService {
     if (donation.userId === adminId) {
       throw new ForbiddenException({ error: 'cannot_review_own_donation' });
     }
-    return this.applyTransition(donation.id, donation.status, decision, adminId, {
-      reviewedById: adminId,
-      reviewedAt: new Date(),
-      ...(decision === 'rejected' ? { rejectionReason: note ?? null } : {}),
-    }, note);
+    return this.applyTransition(
+      donation.id,
+      donation.status,
+      decision,
+      adminId,
+      {
+        reviewedById: adminId,
+        reviewedAt: new Date(),
+        ...(decision === 'rejected' ? { rejectionReason: note ?? null } : {}),
+      },
+      note,
+    );
   }
 
   async stats() {
@@ -277,14 +319,20 @@ export class DonationsService {
         _sum: { amount: true },
         _count: true,
       }),
-      this.prisma.donationCause.findMany({ select: { id: true, titleFr: true, titleAr: true, goalAmount: true } }),
+      this.prisma.donationCause.findMany({
+        select: { id: true, titleFr: true, titleAr: true, goalAmount: true },
+      }),
       this.prisma.paymentMethod.findMany({ select: { id: true, name: true } }),
     ]);
     const causeName = new Map(causes.map((c) => [c.id, c]));
     const methodName = new Map(methods.map((m) => [m.id, m.name]));
     return {
       currency: 'MRU',
-      byStatus: byStatus.map((s) => ({ status: s.status, count: s._count, amount: s._sum.amount ?? 0 })),
+      byStatus: byStatus.map((s) => ({
+        status: s.status,
+        count: s._count,
+        amount: s._sum.amount ?? 0,
+      })),
       confirmedByCause: byCause.map((c) => ({
         causeId: c.causeId,
         title: causeName.get(c.causeId)?.titleFr ?? null,

@@ -1,4 +1,12 @@
-import { Controller, Get, Injectable, Module, NotFoundException, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Injectable,
+  Module,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { Public } from '../../common/decorators/auth.decorators';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';

@@ -24,11 +24,20 @@ export function PdfReaderScreen({ route, navigation }: RootScreenProps<'PdfReade
   const [failed, setFailed] = useState(false);
 
   useLayoutEffect(() => {
-    if (book) navigation.setOptions({ title: locale === 'ar' ? book.titleAr : localized(book, 'title', locale) });
+    if (book)
+      navigation.setOptions({
+        title: locale === 'ar' ? book.titleAr : localized(book, 'title', locale),
+      });
   }, [navigation, book, locale]);
 
   if (!download || failed) {
-    return <MessageState tone="error" title={t('library.cannotOpen')} message={t('library.cannotOpenHint')} />;
+    return (
+      <MessageState
+        tone="error"
+        title={t('library.cannotOpen')}
+        message={t('library.cannotOpenHint')}
+      />
+    );
   }
 
   return (
@@ -44,9 +53,13 @@ export function PdfReaderScreen({ route, navigation }: RootScreenProps<'PdfReade
         onError={() => setFailed(true)}
         style={[styles.pdf, { backgroundColor: theme.background }]}
       />
-      <View style={[styles.footer, { borderTopColor: theme.border, backgroundColor: theme.surface }]}>
+      <View
+        style={[styles.footer, { borderTopColor: theme.border, backgroundColor: theme.surface }]}
+      >
         <AppText variant="small" accessibilityLiveRegion="polite">
-          {page.total > 0 ? t('library.pageOf', { page: page.current, total: page.total }) : t('common.loading')}
+          {page.total > 0
+            ? t('library.pageOf', { page: page.current, total: page.total })
+            : t('common.loading')}
         </AppText>
       </View>
     </Screen>

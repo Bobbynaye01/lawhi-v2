@@ -16,7 +16,12 @@ describe('Public API', () => {
     it('lists the 114 surahs with Hafs and Warsh verse counts', async () => {
       const res = await api().get('/api/quran/surahs').expect(200);
       expect(res.body).toHaveLength(114);
-      expect(res.body[1]).toMatchObject({ id: 2, nameAr: 'البقرة', versesHafs: 286, versesWarsh: 285 });
+      expect(res.body[1]).toMatchObject({
+        id: 2,
+        nameAr: 'البقرة',
+        versesHafs: 286,
+        versesWarsh: 285,
+      });
     });
 
     it('serves real Warsh text, distinct from Hafs', async () => {
@@ -41,7 +46,9 @@ describe('Public API', () => {
         .get('/api/quran/search')
         .query({ q: 'الله لا إله إلا هو الحي القيوم' })
         .expect(200);
-      const keys = res.body.results.map((v: { surah: number; verse: number }) => `${v.surah}:${v.verse}`);
+      const keys = res.body.results.map(
+        (v: { surah: number; verse: number }) => `${v.surah}:${v.verse}`,
+      );
       expect(keys).toContain('2:255');
     });
 
@@ -88,7 +95,10 @@ describe('Public API', () => {
         .get('/api/prayer/times')
         .query({ lat: 18, lon: -15, date: '2026-10-01', method: 'Invented' })
         .expect(400);
-      await api().get('/api/prayer/times').query({ lat: 99, lon: 0, date: '2026-10-01' }).expect(400);
+      await api()
+        .get('/api/prayer/times')
+        .query({ lat: 99, lon: 0, date: '2026-10-01' })
+        .expect(400);
     });
 
     it('returns the Qibla bearing', async () => {
@@ -102,7 +112,8 @@ describe('Public API', () => {
     it('serves the migrated adhkar and ad’iya', async () => {
       const adhkar = await api().get('/api/adhkar/categories?kind=adhkar').expect(200);
       const dua = await api().get('/api/adhkar/categories?kind=dua').expect(200);
-      const count = (cats: { _count: { items: number } }[]) => cats.reduce((n, c) => n + c._count.items, 0);
+      const count = (cats: { _count: { items: number } }[]) =>
+        cats.reduce((n, c) => n + c._count.items, 0);
       expect(count(adhkar.body)).toBe(67);
       expect(count(dua.body)).toBe(18);
       const morning = await api().get('/api/adhkar/categories/morning').expect(200);

@@ -12,8 +12,7 @@ export type TabParamList = {
 };
 
 export type ReaderTarget =
-  | { kind: 'surah'; number: number; verse?: number }
-  | { kind: DivisionKind; number: number };
+  { kind: 'surah'; number: number; verse?: number } | { kind: DivisionKind; number: number };
 
 export type RootStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList>;
@@ -39,7 +38,10 @@ export type RootStackParamList = {
   ResetPassword: undefined;
 };
 
-export type RootScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
+export type RootScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
+  RootStackParamList,
+  T
+>;
 
 export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, T>,

@@ -63,7 +63,14 @@ export class QuranController {
   }
 
   @Get('search')
-  search(@Query(new ZodValidationPipe(searchQuerySchema)) query: { q: string; riwaya: Riwaya; limit: number }) {
+  search(
+    @Query(new ZodValidationPipe(searchQuerySchema))
+    query: {
+      q: string;
+      riwaya: Riwaya;
+      limit: number;
+    },
+  ) {
     return this.quran.search(query.q, query.riwaya, query.limit);
   }
 

@@ -10,7 +10,11 @@ export interface AuthState {
 
 /** Current Supabase session, kept in sync with sign-in/out and token refresh. */
 export function useAuth(): AuthState {
-  const [state, setState] = useState<AuthState>({ configured: supabase !== null, loading: supabase !== null, session: null });
+  const [state, setState] = useState<AuthState>({
+    configured: supabase !== null,
+    loading: supabase !== null,
+    session: null,
+  });
 
   useEffect(() => {
     if (!supabase) return;

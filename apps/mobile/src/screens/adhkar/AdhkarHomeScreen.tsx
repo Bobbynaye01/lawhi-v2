@@ -6,7 +6,11 @@ import { AppText, ListRow, Screen } from '../../components/ui';
 import { fonts, MIN_TOUCH, radius, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import type { TabScreenProps } from '../../navigation/types';
-import { contentRepository, type Dhikr, type DhikrCategory } from '../../repositories/contentRepository';
+import {
+  contentRepository,
+  type Dhikr,
+  type DhikrCategory,
+} from '../../repositories/contentRepository';
 import { useAdhkarStore } from '../../stores/adhkarStore';
 import { localized, useLocale } from '../../utils/localize';
 
@@ -34,7 +38,9 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
     if (needle.length < 2) return null;
     return all.flatMap((c) =>
       c.items
-        .filter((d) => normalizeArabicForSearch(`${d.title ?? ''} ${d.arabicText}`).includes(needle))
+        .filter((d) =>
+          normalizeArabicForSearch(`${d.title ?? ''} ${d.arabicText}`).includes(needle),
+        )
         .map((d) => ({ dhikr: d, categoryId: c.id })),
     );
   }, [all, query]);
@@ -54,14 +60,21 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
           placeholder={t('adhkar.searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           accessibilityLabel={t('adhkar.search')}
-          style={[styles.input, { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }]}
+          style={[
+            styles.input,
+            { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface },
+          ]}
         />
       </View>
       {matches ? (
         <SectionList
           sections={[{ title: t('adhkar.results', { count: matches.length }), data: matches }]}
           keyExtractor={(m) => m.dhikr.id}
-          renderSectionHeader={({ section }) => <AppText variant="small" style={styles.section}>{section.title}</AppText>}
+          renderSectionHeader={({ section }) => (
+            <AppText variant="small" style={styles.section}>
+              {section.title}
+            </AppText>
+          )}
           renderItem={({ item }) => (
             <ListRow
               title={preview(item.dhikr)}
@@ -74,22 +87,36 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
         <SectionList<Row, Section>
           sections={[
             ...(favoriteItems.length > 0
-              ? [{ key: 'favorites', title: t('adhkar.favorites'), data: favoriteItems.map((f): Row => ({ kind: 'favorite', ...f })) }]
+              ? [
+                  {
+                    key: 'favorites',
+                    title: t('adhkar.favorites'),
+                    data: favoriteItems.map((f): Row => ({ kind: 'favorite', ...f })),
+                  },
+                ]
               : []),
             {
               key: 'adhkar',
               title: t('adhkar.adhkar'),
-              data: contentRepository.categories('adhkar').map((c): Row => ({ kind: 'category', category: c })),
+              data: contentRepository
+                .categories('adhkar')
+                .map((c): Row => ({ kind: 'category', category: c })),
             },
             {
               key: 'dua',
               title: t('adhkar.duas'),
-              data: contentRepository.categories('dua').map((c): Row => ({ kind: 'category', category: c })),
+              data: contentRepository
+                .categories('dua')
+                .map((c): Row => ({ kind: 'category', category: c })),
             },
             { key: 'tools', title: t('adhkar.tools'), data: [{ kind: 'tasbih' }] },
           ]}
           keyExtractor={(item, i) =>
-            item.kind === 'category' ? item.category.id : item.kind === 'favorite' ? `fav-${item.dhikr.id}` : `tool-${i}`
+            item.kind === 'category'
+              ? item.category.id
+              : item.kind === 'favorite'
+                ? `fav-${item.dhikr.id}`
+                : `tool-${i}`
           }
           renderSectionHeader={({ section }) => (
             <AppText variant="heading" accessibilityRole="header" style={styles.section}>
@@ -100,9 +127,17 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
             if (item.kind === 'category') {
               return (
                 <ListRow
-                  title={locale === 'ar' ? item.category.titleAr : localized(item.category, 'title', locale)}
+                  title={
+                    locale === 'ar'
+                      ? item.category.titleAr
+                      : localized(item.category, 'title', locale)
+                  }
                   subtitle={t('adhkar.itemsCount', { count: item.category.items.length })}
-                  trailing={locale === 'ar' ? null : <AppText style={styles.arabic}>{item.category.titleAr}</AppText>}
+                  trailing={
+                    locale === 'ar' ? null : (
+                      <AppText style={styles.arabic}>{item.category.titleAr}</AppText>
+                    )
+                  }
                   onPress={() => navigation.navigate('AdhkarCategory', { id: item.category.id })}
                 />
               );
@@ -116,7 +151,13 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
                 />
               );
             }
-            return <ListRow title={t('adhkar.tasbih')} subtitle={t('adhkar.tasbihHint')} onPress={() => navigation.navigate('Tasbih')} />;
+            return (
+              <ListRow
+                title={t('adhkar.tasbih')}
+                subtitle={t('adhkar.tasbihHint')}
+                onPress={() => navigation.navigate('Tasbih')}
+              />
+            );
           }}
         />
       )}
@@ -126,7 +167,13 @@ export function AdhkarHomeScreen({ navigation }: TabScreenProps<'Adhkar'>) {
 
 const styles = StyleSheet.create({
   searchBox: { padding: spacing.lg },
-  input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontSize: 17 },
+  input: {
+    minHeight: MIN_TOUCH,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    fontSize: 17,
+  },
   section: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.xs },
   arabic: { fontFamily: fonts.arabic, fontSize: 18 },
 });

@@ -21,7 +21,10 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
 
   // Also accept "2:255" to jump straight to a verse.
   const reference = /^\s*(\d{1,3})\s*[:.]\s*(\d{1,3})\s*$/.exec(deferred);
-  const results = useMemo(() => quranRepository.search(riwaya, deferred, LIMIT), [riwaya, deferred]);
+  const results = useMemo(
+    () => quranRepository.search(riwaya, deferred, LIMIT),
+    [riwaya, deferred],
+  );
 
   return (
     <Screen scroll={false} edges={['bottom']}>
@@ -33,7 +36,10 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
           placeholderTextColor={theme.textMuted}
           accessibilityLabel={t('quran.search')}
           autoFocus
-          style={[styles.input, { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }]}
+          style={[
+            styles.input,
+            { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface },
+          ]}
         />
         <AppText variant="small">{t(`quran.riwaya.${riwaya}`)}</AppText>
       </View>
@@ -58,7 +64,9 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
           ListHeaderComponent={
             results.length > 0 ? (
               <AppText variant="small" style={{ paddingHorizontal: spacing.lg }}>
-                {results.length === LIMIT ? t('quran.resultsLimited', { count: LIMIT }) : t('quran.resultsCount', { count: results.length })}
+                {results.length === LIMIT
+                  ? t('quran.resultsLimited', { count: LIMIT })
+                  : t('quran.resultsCount', { count: results.length })}
               </AppText>
             ) : null
           }
@@ -66,7 +74,13 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
             <ListRow
               title={`${localized(quranRepository.surah(item.surah)!, 'name', locale)} ${item.surah}:${item.verse}`}
               subtitle={undefined}
-              onPress={() => navigation.navigate('QuranReader', { kind: 'surah', number: item.surah, verse: item.verse })}
+              onPress={() =>
+                navigation.navigate('QuranReader', {
+                  kind: 'surah',
+                  number: item.surah,
+                  verse: item.verse,
+                })
+              }
               trailing={
                 <AppText numberOfLines={2} style={[styles.arabic, { color: theme.quranText }]}>
                   {item.text}
@@ -82,6 +96,12 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
 
 const styles = StyleSheet.create({
   searchBox: { padding: spacing.lg, gap: spacing.xs },
-  input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontSize: 18 },
+  input: {
+    minHeight: MIN_TOUCH,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    fontSize: 18,
+  },
   arabic: { fontFamily: fonts.arabic, fontSize: 18, maxWidth: '62%', textAlign: 'right' },
 });

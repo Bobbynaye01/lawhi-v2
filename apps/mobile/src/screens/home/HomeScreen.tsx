@@ -15,7 +15,12 @@ import { formatTime, localized, useLocale } from '../../utils/localize';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-const shortcuts: { key: string; icon: IconName; tab?: 'Quran' | 'Prayer' | 'Qibla' | 'Adhkar'; route?: keyof RootStackParamList }[] = [
+const shortcuts: {
+  key: string;
+  icon: IconName;
+  tab?: 'Quran' | 'Prayer' | 'Qibla' | 'Adhkar';
+  route?: keyof RootStackParamList;
+}[] = [
   { key: 'quran', icon: 'book-outline', tab: 'Quran' },
   { key: 'prayer', icon: 'time-outline', tab: 'Prayer' },
   { key: 'qibla', icon: 'compass-outline', tab: 'Qibla' },
@@ -33,7 +38,9 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
   const lastRead = useQuranStore((s) => s.lastRead[riwaya]);
   const { next, now } = usePrayerDays();
 
-  const minutesLeft = next ? Math.max(0, Math.round((next.at.getTime() - now.getTime()) / 60000)) : 0;
+  const minutesLeft = next
+    ? Math.max(0, Math.round((next.at.getTime() - now.getTime()) / 60000))
+    : 0;
 
   return (
     <Screen edges={[]}>
@@ -71,7 +78,11 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
         <Pressable
           accessibilityRole="button"
           onPress={() =>
-            navigation.navigate('QuranReader', { kind: 'surah', number: lastRead.surah, verse: lastRead.verse })
+            navigation.navigate('QuranReader', {
+              kind: 'surah',
+              number: lastRead.surah,
+              verse: lastRead.verse,
+            })
           }
         >
           <Card>
@@ -91,14 +102,22 @@ export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
             key={s.key}
             accessibilityRole="button"
             accessibilityLabel={t(`home.shortcuts.${s.key}`)}
-            onPress={() => (s.tab ? navigation.navigate(s.tab) : s.route && navigation.navigate(s.route as never))}
+            onPress={() =>
+              s.tab ? navigation.navigate(s.tab) : s.route && navigation.navigate(s.route as never)
+            }
             style={({ pressed }) => [
               styles.tile,
-              { backgroundColor: theme.surface, borderColor: theme.border, opacity: pressed ? 0.8 : 1 },
+              {
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+                opacity: pressed ? 0.8 : 1,
+              },
             ]}
           >
             <Ionicons name={s.icon} size={30} color={theme.primary} />
-            <AppText style={{ marginTop: spacing.sm, textAlign: 'center' }}>{t(`home.shortcuts.${s.key}`)}</AppText>
+            <AppText style={{ marginTop: spacing.sm, textAlign: 'center' }}>
+              {t(`home.shortcuts.${s.key}`)}
+            </AppText>
           </Pressable>
         ))}
       </View>

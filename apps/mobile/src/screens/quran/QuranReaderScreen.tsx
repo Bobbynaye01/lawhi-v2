@@ -93,7 +93,10 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
   // Verse heights vary, so jump after the first render instead of initialScrollIndex.
   useEffect(() => {
     if (initialIndex === 0) return;
-    const id = setTimeout(() => listRef.current?.scrollToIndex({ index: initialIndex, animated: false }), 150);
+    const id = setTimeout(
+      () => listRef.current?.scrollToIndex({ index: initialIndex, animated: false }),
+      150,
+    );
     return () => clearTimeout(id);
   }, [initialIndex]);
 
@@ -104,7 +107,10 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
     ({ viewableItems }: { viewableItems: ViewToken<Item>[] }) => {
       const first = viewableItems.find((v) => v.item?.type === 'verse')?.item;
       if (first?.type === 'verse') {
-        saveLastRead(useSettingsStore.getState().riwaya, { surah: first.verse.surah, verse: first.verse.verse });
+        saveLastRead(useSettingsStore.getState().riwaya, {
+          surah: first.verse.surah,
+          verse: first.verse.verse,
+        });
       }
     },
     [saveLastRead],
@@ -115,11 +121,20 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
   const sheetActions = (): SheetAction[] => {
     if (!selected) return [];
     const { verse, index } = selected;
-    const marked = bookmarks.some((b) => b.riwaya === riwaya && b.surah === verse.surah && b.verse === verse.verse);
+    const marked = bookmarks.some(
+      (b) => b.riwaya === riwaya && b.surah === verse.surah && b.verse === verse.verse,
+    );
     const reciterId = useSettingsStore.getState().reciterByRiwaya[riwaya];
     const reciter = reciterId ? contentRepository.reciter(reciterId) : undefined;
     return [
-      ...(reciter ? [{ label: t('quran.playFromHere'), onPress: () => void recitation.start(reciter, verses, index) }] : []),
+      ...(reciter
+        ? [
+            {
+              label: t('quran.playFromHere'),
+              onPress: () => void recitation.start(reciter, verses, index),
+            },
+          ]
+        : []),
       {
         label: marked ? t('quran.removeBookmark') : t('quran.addBookmark'),
         onPress: () => toggleBookmark(riwaya, verse),
@@ -132,22 +147,33 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
       const surah = quranRepository.surah(item.surah)!;
       const basmala = quranRepository.basmalaFor(riwaya, item.surah);
       return (
-        <View style={[styles.header, { borderColor: theme.accent, backgroundColor: theme.card }]} accessibilityRole="header">
+        <View
+          style={[styles.header, { borderColor: theme.accent, backgroundColor: theme.card }]}
+          accessibilityRole="header"
+        >
           <AppText style={[styles.surahName, { color: theme.primary }]}>{surah.nameAr}</AppText>
-          {basmala ? <AppText style={[styles.basmala, { color: theme.quranText }]}>{basmala}</AppText> : null}
+          {basmala ? (
+            <AppText style={[styles.basmala, { color: theme.quranText }]}>{basmala}</AppText>
+          ) : null}
         </View>
       );
     }
     const { verse, index } = item;
     const isPlaying = playing?.surah === verse.surah && playing.verse === verse.verse;
-    const marked = bookmarks.some((b) => b.riwaya === riwaya && b.surah === verse.surah && b.verse === verse.verse);
+    const marked = bookmarks.some(
+      (b) => b.riwaya === riwaya && b.surah === verse.surah && b.verse === verse.verse,
+    );
     return (
       <Pressable
         onPress={() => setSelected({ verse, index })}
         accessibilityRole="button"
         accessibilityLabel={t('quran.verseA11y', { surah: verse.surah, verse: verse.verse })}
         accessibilityHint={t('quran.verseHint')}
-        style={[styles.verse, { borderBottomColor: theme.border }, isPlaying && { backgroundColor: theme.card }]}
+        style={[
+          styles.verse,
+          { borderBottomColor: theme.border },
+          isPlaying && { backgroundColor: theme.card },
+        ]}
       >
         <AppText
           style={[
@@ -157,7 +183,9 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
         >
           {verse.text} ﴿{verse.verse}﴾
         </AppText>
-        {marked ? <Ionicons name="bookmark" size={16} color={theme.accent} style={styles.mark} /> : null}
+        {marked ? (
+          <Ionicons name="bookmark" size={16} color={theme.accent} style={styles.mark} />
+        ) : null}
       </Pressable>
     );
   };
@@ -168,7 +196,9 @@ export function QuranReaderScreen({ route, navigation }: RootScreenProps<'QuranR
         ref={listRef}
         data={items}
         renderItem={renderItem}
-        keyExtractor={(it) => (it.type === 'header' ? `h${it.surah}` : `v${it.verse.surah}:${it.verse.verse}`)}
+        keyExtractor={(it) =>
+          it.type === 'header' ? `h${it.surah}` : `v${it.verse.surah}:${it.verse.verse}`
+        }
         onScrollToIndexFailed={({ index }) =>
           setTimeout(() => listRef.current?.scrollToIndex({ index, animated: false }), 200)
         }
@@ -203,8 +233,17 @@ const styles = StyleSheet.create({
   },
   surahName: { fontFamily: fonts.arabicBold, fontSize: 26 },
   basmala: { fontFamily: fonts.arabic, fontSize: 22, textAlign: 'center' },
-  verse: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth },
+  verse: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
   verseText: { fontFamily: fonts.arabic, textAlign: 'right', writingDirection: 'rtl' },
   mark: { position: 'absolute', top: spacing.sm, left: spacing.sm },
-  headerButton: { minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
+  headerButton: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

@@ -39,7 +39,11 @@ export function MyDonationsScreen({ navigation }: RootScreenProps<'MyDonations'>
           <ListRow
             title={`${formatMRU(item.amount)} · ${localized(item.cause, 'title', locale)}`}
             subtitle={`${item.code} · ${formatDateTime(item.createdAt, locale)}`}
-            trailing={<AppText style={{ color: statusColor(item.status, theme) }}>{t(`donations.status.${item.status}`)}</AppText>}
+            trailing={
+              <AppText style={{ color: statusColor(item.status, theme) }}>
+                {t(`donations.status.${item.status}`)}
+              </AppText>
+            }
             onPress={() => navigation.navigate('DonationDetail', { donationId: item.id })}
           />
         )}

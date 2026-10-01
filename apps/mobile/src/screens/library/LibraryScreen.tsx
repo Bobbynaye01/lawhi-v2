@@ -26,7 +26,12 @@ export function LibraryScreen({ navigation }: RootScreenProps<'Library'>) {
             leading={<Ionicons name="book" size={26} color={theme.primary} />}
             trailing={
               downloads[item.id] ? (
-                <Ionicons name="cloud-done-outline" size={20} color={theme.success} accessibilityLabel={t('library.downloaded')} />
+                <Ionicons
+                  name="cloud-done-outline"
+                  size={20}
+                  color={theme.success}
+                  accessibilityLabel={t('library.downloaded')}
+                />
               ) : null
             }
             onPress={() => navigation.navigate('BookDetail', { bookId: item.id })}

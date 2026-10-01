@@ -60,7 +60,15 @@ export class QuranService {
     return this.prisma.reciter.findMany({
       where: { riwaya, enabled: true },
       orderBy: { sortOrder: 'asc' },
-      select: { id: true, nameAr: true, nameFr: true, nameEn: true, riwaya: true, provider: true, folder: true },
+      select: {
+        id: true,
+        nameAr: true,
+        nameFr: true,
+        nameEn: true,
+        riwaya: true,
+        provider: true,
+        folder: true,
+      },
     });
   }
 }

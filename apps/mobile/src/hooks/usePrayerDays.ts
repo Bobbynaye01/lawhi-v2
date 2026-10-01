@@ -14,7 +14,11 @@ export function useNow(intervalMs = 30_000): Date {
 }
 
 /** Prayer times for today and tomorrow at the saved place — computed offline. */
-export function usePrayerDays(): { days: PrayerDay[] | null; next: ReturnType<typeof nextPrayer>; now: Date } {
+export function usePrayerDays(): {
+  days: PrayerDay[] | null;
+  next: ReturnType<typeof nextPrayer>;
+  now: Date;
+} {
   const place = useLocationStore((s) => s.place);
   const method = useSettingsStore((s) => s.prayerMethod);
   const madhab = useSettingsStore((s) => s.madhab);
@@ -24,7 +28,14 @@ export function usePrayerDays(): { days: PrayerDay[] | null; next: ReturnType<ty
   const days = useMemo(
     () =>
       place
-        ? computePrayerDays({ latitude: place.latitude, longitude: place.longitude, date: today, days: 2, method, madhab })
+        ? computePrayerDays({
+            latitude: place.latitude,
+            longitude: place.longitude,
+            date: today,
+            days: 2,
+            method,
+            madhab,
+          })
         : null,
     [place, method, madhab, today],
   );

@@ -5,7 +5,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { FormField } from '../../components/FormField';
-import { AppText, Button, Card, LoadingState, MessageState, Notice, Screen, SectionTitle } from '../../components/ui';
+import {
+  AppText,
+  Button,
+  Card,
+  LoadingState,
+  MessageState,
+  Notice,
+  Screen,
+  SectionTitle,
+} from '../../components/ui';
 import { MIN_TOUCH, radius, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import type { RootScreenProps } from '../../navigation/types';
@@ -103,14 +112,23 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
             onPress={() => setMethodId(m.id)}
             style={[
               styles.chip,
-              { borderColor: m.id === methodId ? theme.primary : theme.border, backgroundColor: m.id === methodId ? theme.primary : theme.surface },
+              {
+                borderColor: m.id === methodId ? theme.primary : theme.border,
+                backgroundColor: m.id === methodId ? theme.primary : theme.surface,
+              },
             ]}
           >
-            <AppText style={{ color: m.id === methodId ? theme.onPrimary : theme.text }}>{m.name}</AppText>
+            <AppText style={{ color: m.id === methodId ? theme.onPrimary : theme.text }}>
+              {m.name}
+            </AppText>
           </Pressable>
         ))}
       </View>
-      {errors.paymentMethodId ? <AppText variant="small" style={{ color: theme.danger }}>{errors.paymentMethodId}</AppText> : null}
+      {errors.paymentMethodId ? (
+        <AppText variant="small" style={{ color: theme.danger }}>
+          {errors.paymentMethodId}
+        </AppText>
+      ) : null}
 
       {method ? (
         <Card>
@@ -140,7 +158,10 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
             onPress={() => setAmountText(String(p))}
             style={[
               styles.chip,
-              { borderColor: amount === p ? theme.primary : theme.border, backgroundColor: amount === p ? theme.card : theme.surface },
+              {
+                borderColor: amount === p ? theme.primary : theme.border,
+                backgroundColor: amount === p ? theme.card : theme.surface,
+              },
             ]}
           >
             <AppText>{formatMRU(p)}</AppText>
@@ -158,7 +179,13 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
 
       <SectionTitle>{t('donations.step3')}</SectionTitle>
       <AppText variant="small">{t('donations.optionalInfo')}</AppText>
-      <FormField label={t('donations.donorName')} value={donorName} onChangeText={setDonorName} error={errors.donorName} autoComplete="name" />
+      <FormField
+        label={t('donations.donorName')}
+        value={donorName}
+        onChangeText={setDonorName}
+        error={errors.donorName}
+        autoComplete="name"
+      />
       <FormField
         label={t('donations.donorPhone')}
         value={donorPhone}
@@ -185,5 +212,11 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
 
 const styles = StyleSheet.create({
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  chip: { minHeight: MIN_TOUCH, paddingHorizontal: spacing.lg, borderRadius: radius.pill, borderWidth: 1.5, justifyContent: 'center' },
+  chip: {
+    minHeight: MIN_TOUCH,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+  },
 });

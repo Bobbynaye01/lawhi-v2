@@ -37,7 +37,12 @@ export function BookChapterScreen({ route, navigation }: RootScreenProps<'BookCh
           <Card>
             <AppText variant="small">{t('library.entryNumber', { number: item.number })}</AppText>
             {item.narrator ? <AppText variant="muted">{item.narrator}</AppText> : null}
-            <AppText style={[styles.text, { color: theme.quranText, fontSize: 19 * fontScale, lineHeight: 36 * fontScale }]}>
+            <AppText
+              style={[
+                styles.text,
+                { color: theme.quranText, fontSize: 19 * fontScale, lineHeight: 36 * fontScale },
+              ]}
+            >
               {item.text}
             </AppText>
             {item.reference ? <AppText variant="small">{item.reference}</AppText> : null}

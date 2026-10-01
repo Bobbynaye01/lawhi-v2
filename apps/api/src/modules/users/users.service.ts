@@ -17,7 +17,14 @@ export class UsersService {
   async me(userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
-      select: { id: true, email: true, displayName: true, role: true, createdAt: true, settings: true },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        createdAt: true,
+        settings: true,
+      },
     });
     return user;
   }
@@ -99,7 +106,10 @@ export class UsersService {
           },
         });
       }
-      await tx.donation.updateMany({ where: { userId }, data: { donorName: null, donorPhone: null } });
+      await tx.donation.updateMany({
+        where: { userId },
+        data: { donorName: null, donorPhone: null },
+      });
       await tx.bookmark.deleteMany({ where: { userId } });
       await tx.readingPosition.deleteMany({ where: { userId } });
       await tx.userSettings.deleteMany({ where: { userId } });

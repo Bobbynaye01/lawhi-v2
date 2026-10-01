@@ -5,7 +5,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, View } from 'react-native';
 import { ActionSheet } from '../../components/ActionSheet';
-import { AppText, Button, Card, ListRow, Screen, SectionTitle, Segmented } from '../../components/ui';
+import {
+  AppText,
+  Button,
+  Card,
+  ListRow,
+  Screen,
+  SectionTitle,
+  Segmented,
+} from '../../components/ui';
 import { fonts, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { changeLanguage } from '../../i18n';
@@ -46,7 +54,9 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
           { value: 'en', label: 'English' },
         ]}
       />
-      {Platform.OS !== 'web' ? <AppText variant="small">{t('settings.languageRestart')}</AppText> : null}
+      {Platform.OS !== 'web' ? (
+        <AppText variant="small">{t('settings.languageRestart')}</AppText>
+      ) : null}
 
       <SectionTitle>{t('settings.appearance')}</SectionTitle>
       <Segmented
@@ -73,9 +83,15 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
       <Card style={{ padding: 0 }}>
         <ListRow
           title={t('settings.reciter')}
-          subtitle={reciter ? localized(reciter, 'name', locale) : t('quran.audio.noReciterForRiwaya')}
+          subtitle={
+            reciter ? localized(reciter, 'name', locale) : t('quran.audio.noReciterForRiwaya')
+          }
           onPress={reciters.length > 0 ? () => setPicker('reciter') : undefined}
-          trailing={reciters.length > 0 ? <Ionicons name="chevron-forward" size={18} color={theme.textMuted} /> : null}
+          trailing={
+            reciters.length > 0 ? (
+              <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+            ) : null
+          }
         />
       </Card>
       <AppText variant="muted">{t('settings.textSize')}</AppText>
@@ -87,7 +103,9 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
           onPress={() => s.setQuranFontScale(s.quranFontScale - FONT_SCALE.step)}
           accessibilityHint={t('quran.smallerText')}
         />
-        <AppText style={{ flex: 1, textAlign: 'center' }}>{Math.round(s.quranFontScale * 100)}%</AppText>
+        <AppText style={{ flex: 1, textAlign: 'center' }}>
+          {Math.round(s.quranFontScale * 100)}%
+        </AppText>
         <Button
           title="A+"
           variant="secondary"
@@ -96,7 +114,16 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
           accessibilityHint={t('quran.largerText')}
         />
       </View>
-      <AppText style={[styles.preview, { fontSize: 24 * s.quranFontScale, lineHeight: 44 * s.quranFontScale, color: theme.quranText }]}>
+      <AppText
+        style={[
+          styles.preview,
+          {
+            fontSize: 24 * s.quranFontScale,
+            lineHeight: 44 * s.quranFontScale,
+            color: theme.quranText,
+          },
+        ]}
+      >
         {quranRepository.versesOfSurah(s.riwaya, 112)[0]?.text}
       </AppText>
 
@@ -123,14 +150,24 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
 
       <SectionTitle>{t('settings.account')}</SectionTitle>
       <Card style={{ padding: 0 }}>
-        <ListRow title={t('settings.account')} onPress={() => navigation.navigate('Account')} trailing={<Ionicons name="chevron-forward" size={18} color={theme.textMuted} />} />
-        <ListRow title={t('donations.myDonations')} onPress={() => navigation.navigate('MyDonations')} trailing={<Ionicons name="chevron-forward" size={18} color={theme.textMuted} />} />
+        <ListRow
+          title={t('settings.account')}
+          onPress={() => navigation.navigate('Account')}
+          trailing={<Ionicons name="chevron-forward" size={18} color={theme.textMuted} />}
+        />
+        <ListRow
+          title={t('donations.myDonations')}
+          onPress={() => navigation.navigate('MyDonations')}
+          trailing={<Ionicons name="chevron-forward" size={18} color={theme.textMuted} />}
+        />
       </Card>
 
       {Platform.OS !== 'web' ? (
         <>
           <SectionTitle>{t('settings.storage')}</SectionTitle>
-          <AppText variant="muted">{t('settings.audioCache', { mb: (cacheBytes / 1048576).toFixed(1) })}</AppText>
+          <AppText variant="muted">
+            {t('settings.audioCache', { mb: (cacheBytes / 1048576).toFixed(1) })}
+          </AppText>
           <Button
             title={t('settings.clearAudioCache')}
             variant="secondary"
@@ -144,7 +181,9 @@ export function SettingsScreen({ navigation }: RootScreenProps<'Settings'>) {
       ) : null}
 
       <SectionTitle>{t('settings.about')}</SectionTitle>
-      <AppText variant="small">{t('settings.version', { version: Constants.expoConfig?.version ?? '' })}</AppText>
+      <AppText variant="small">
+        {t('settings.version', { version: Constants.expoConfig?.version ?? '' })}
+      </AppText>
       <AppText variant="small">{t('settings.sources')}</AppText>
 
       <ActionSheet

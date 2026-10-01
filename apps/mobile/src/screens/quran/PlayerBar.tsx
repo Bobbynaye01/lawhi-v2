@@ -42,7 +42,12 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
     <View style={[styles.bar, { borderTopColor: theme.border, backgroundColor: theme.surface }]}>
       {status !== 'idle' ? (
         <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-          <View style={[styles.progressFill, { backgroundColor: theme.primary, width: `${progress * 100}%` }]} />
+          <View
+            style={[
+              styles.progressFill,
+              { backgroundColor: theme.primary, width: `${progress * 100}%` },
+            ]}
+          />
         </View>
       ) : null}
       <View style={styles.row}>
@@ -65,14 +70,32 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
           <IconButton icon="play" label={t('quran.audio.play')} onPress={start} />
         ) : (
           <>
-            <IconButton icon="play-skip-back" label={t('quran.audio.previous')} onPress={() => void recitation.previous()} />
+            <IconButton
+              icon="play-skip-back"
+              label={t('quran.audio.previous')}
+              onPress={() => void recitation.previous()}
+            />
             <IconButton
               icon={status === 'playing' ? 'pause' : status === 'error' ? 'refresh' : 'play'}
-              label={t(status === 'playing' ? 'quran.audio.pause' : status === 'error' ? 'common.retry' : 'quran.audio.play')}
+              label={t(
+                status === 'playing'
+                  ? 'quran.audio.pause'
+                  : status === 'error'
+                    ? 'common.retry'
+                    : 'quran.audio.play',
+              )}
               onPress={() => void recitation.toggle()}
             />
-            <IconButton icon="play-skip-forward" label={t('quran.audio.next')} onPress={() => void recitation.next()} />
-            <IconButton icon="stop" label={t('quran.audio.stop')} onPress={() => recitation.stop()} />
+            <IconButton
+              icon="play-skip-forward"
+              label={t('quran.audio.next')}
+              onPress={() => void recitation.next()}
+            />
+            <IconButton
+              icon="stop"
+              label={t('quran.audio.stop')}
+              onPress={() => recitation.stop()}
+            />
           </>
         )}
       </View>
@@ -89,7 +112,11 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
               <ListRow
                 title={localized(item, 'name', locale)}
                 subtitle={locale === 'ar' ? undefined : item.nameAr}
-                trailing={item.id === reciter.id ? <Ionicons name="checkmark" size={22} color={theme.primary} /> : null}
+                trailing={
+                  item.id === reciter.id ? (
+                    <Ionicons name="checkmark" size={22} color={theme.primary} />
+                  ) : null
+                }
                 onPress={() => {
                   setReciter(riwaya, item.id);
                   setPicking(false);
@@ -98,7 +125,12 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
               />
             )}
           />
-          <Button title={t('common.close')} variant="secondary" onPress={() => setPicking(false)} style={{ margin: spacing.lg }} />
+          <Button
+            title={t('common.close')}
+            variant="secondary"
+            onPress={() => setPicking(false)}
+            style={{ margin: spacing.lg }}
+          />
         </View>
       </Modal>
     </View>
@@ -116,16 +148,30 @@ function IconButton({
 }) {
   const theme = useTheme();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.iconButton}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={styles.iconButton}
+    >
       <Ionicons name={icon} size={24} color={theme.primary} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  bar: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  bar: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   progressTrack: { height: 3, borderRadius: 2, overflow: 'hidden', marginBottom: spacing.xs },
   progressFill: { height: 3 },
-  iconButton: { minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
+  iconButton: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

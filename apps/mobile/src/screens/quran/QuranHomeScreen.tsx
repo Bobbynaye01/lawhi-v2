@@ -56,8 +56,14 @@ export function QuranHomeScreen({ navigation }: TabScreenProps<'Quran'>) {
     <ListRow
       onPress={() => navigation.navigate('QuranReader', { kind: 'surah', number: item.id })}
       accessibilityLabel={`${item.id}. ${localized(item, 'name', locale)}`}
-      leading={<AppText variant="muted" style={styles.number}>{item.id}</AppText>}
-      title={locale === 'ar' ? item.nameAr : `${item.nameTranslit} · ${localized(item, 'name', locale)}`}
+      leading={
+        <AppText variant="muted" style={styles.number}>
+          {item.id}
+        </AppText>
+      }
+      title={
+        locale === 'ar' ? item.nameAr : `${item.nameTranslit} · ${localized(item, 'name', locale)}`
+      }
       subtitle={t('quran.surahMeta', {
         count: riwaya === 'hafs' ? item.versesHafs : item.versesWarsh,
         place: t(`quran.revelation.${item.revelationPlace}`),
@@ -90,7 +96,12 @@ export function QuranHomeScreen({ navigation }: TabScreenProps<'Quran'>) {
         />
       </View>
       {tab === 'surah' ? (
-        <FlatList data={surahs} keyExtractor={(s) => String(s.id)} renderItem={renderSurah} initialNumToRender={20} />
+        <FlatList
+          data={surahs}
+          keyExtractor={(s) => String(s.id)}
+          renderItem={renderSurah}
+          initialNumToRender={20}
+        />
       ) : (
         <FlatList
           data={divisions}
@@ -99,12 +110,24 @@ export function QuranHomeScreen({ navigation }: TabScreenProps<'Quran'>) {
             const surah = quranRepository.surah(item.start.surah)!;
             return (
               <ListRow
-                onPress={() => navigation.navigate('QuranReader', { kind: tab as DivisionKind, number: item.number })}
-                leading={<AppText variant="muted" style={styles.number}>{item.number}</AppText>}
+                onPress={() =>
+                  navigation.navigate('QuranReader', {
+                    kind: tab as DivisionKind,
+                    number: item.number,
+                  })
+                }
+                leading={
+                  <AppText variant="muted" style={styles.number}>
+                    {item.number}
+                  </AppText>
+                }
                 title={t(`quran.${tab}Number`, { number: item.number })}
                 subtitle={`${localized(surah, 'name', locale)} · ${t('quran.verseNumber', { number: item.start.verse })}`}
                 trailing={
-                  <AppText numberOfLines={1} style={[styles.arabicStart, { color: theme.textMuted }]}>
+                  <AppText
+                    numberOfLines={1}
+                    style={[styles.arabicStart, { color: theme.textMuted }]}
+                  >
                     {item.start.text.split(' ').slice(0, 3).join(' ')}
                   </AppText>
                 }
@@ -122,5 +145,10 @@ const styles = StyleSheet.create({
   number: { minWidth: 32, textAlign: 'center' },
   arabicName: { fontFamily: fonts.arabic, fontSize: 20 },
   arabicStart: { fontFamily: fonts.arabic, fontSize: 16, maxWidth: 140 },
-  headerButton: { minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
+  headerButton: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

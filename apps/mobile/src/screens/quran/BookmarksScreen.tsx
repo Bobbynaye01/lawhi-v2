@@ -37,14 +37,23 @@ export function BookmarksScreen({ navigation }: RootScreenProps<'Bookmarks'>) {
             subtitle={t(`quran.riwaya.${item.riwaya}`)}
             onPress={() => {
               setRiwaya(item.riwaya);
-              navigation.navigate('QuranReader', { kind: 'surah', number: item.surah, verse: item.verse });
+              navigation.navigate('QuranReader', {
+                kind: 'surah',
+                number: item.surah,
+                verse: item.verse,
+              });
             }}
             trailing={
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t('quran.removeBookmark')}
                 onPress={() => toggleBookmark(item.riwaya, item)}
-                style={{ minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  minWidth: MIN_TOUCH,
+                  minHeight: MIN_TOUCH,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <Ionicons name="trash-outline" size={20} color={theme.danger} />
               </Pressable>

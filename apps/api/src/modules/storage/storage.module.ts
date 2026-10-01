@@ -16,7 +16,10 @@ import { createSupabaseAdmin, SUPABASE_ADMIN } from './supabase-admin';
         const localDir = config.get('LOCAL_STORAGE_DIR', { infer: true });
         if (localDir) return new LocalProofStorage(localDir);
         if (supabase) {
-          return new SupabaseProofStorage(supabase, config.get('SUPABASE_PROOFS_BUCKET', { infer: true }));
+          return new SupabaseProofStorage(
+            supabase,
+            config.get('SUPABASE_PROOFS_BUCKET', { infer: true }),
+          );
         }
         return null;
       },

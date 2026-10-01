@@ -6,7 +6,11 @@ export type HeadingState =
   | { status: 'starting' }
   | { status: 'unsupported' }
   | { status: 'denied' }
-  | { status: 'ok'; heading: number; /** 0 none … 3 high (expo-location scale) */ accuracy: number };
+  | {
+      status: 'ok';
+      heading: number;
+      /** 0 none … 3 high (expo-location scale) */ accuracy: number;
+    };
 
 /** No reading after this delay means the device has no usable compass. */
 const SENSOR_TIMEOUT_MS = 5000;

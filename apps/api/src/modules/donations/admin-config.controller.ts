@@ -55,7 +55,10 @@ export class DonationConfigService {
   }
 
   async updateCause(id: string, input: UpdateCauseInput) {
-    const exists = await this.prisma.donationCause.findUnique({ where: { id }, select: { id: true } });
+    const exists = await this.prisma.donationCause.findUnique({
+      where: { id },
+      select: { id: true },
+    });
     if (!exists) throw new NotFoundException({ error: 'cause_not_found' });
     return this.prisma.donationCause.update({ where: { id }, data: input });
   }

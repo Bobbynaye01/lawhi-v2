@@ -45,9 +45,9 @@ describe('createDonationSchema', () => {
   });
 
   it('normalizes the donor phone', () => {
-    expect(createDonationSchema.parse({ ...valid, donorPhone: '+222 34 99 83 70' }).donorPhone).toBe(
-      '34998370',
-    );
+    expect(
+      createDonationSchema.parse({ ...valid, donorPhone: '+222 34 99 83 70' }).donorPhone,
+    ).toBe('34998370');
   });
 });
 

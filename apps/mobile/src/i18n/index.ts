@@ -62,4 +62,4 @@ export async function changeLanguage(locale: Locale) {
   }
 }
 
-export default i18n;
+export { i18n };

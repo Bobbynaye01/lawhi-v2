@@ -3,7 +3,12 @@ import { MIN_TOUCH, radius, spacing } from '../constants/theme';
 import { useTheme } from '../hooks/useTheme';
 import { AppText } from './ui';
 
-export function FormField({ label, error, hint, ...input }: TextInputProps & { label: string; error?: string | null; hint?: string }) {
+export function FormField({
+  label,
+  error,
+  hint,
+  ...input
+}: TextInputProps & { label: string; error?: string | null; hint?: string }) {
   const theme = useTheme();
   return (
     <View style={{ gap: spacing.xs }}>
@@ -17,7 +22,11 @@ export function FormField({ label, error, hint, ...input }: TextInputProps & { l
         placeholderTextColor={theme.textMuted}
         style={[
           styles.input,
-          { color: theme.text, backgroundColor: theme.surface, borderColor: error ? theme.danger : theme.border },
+          {
+            color: theme.text,
+            backgroundColor: theme.surface,
+            borderColor: error ? theme.danger : theme.border,
+          },
           input.style,
         ]}
       />
@@ -33,5 +42,11 @@ export function FormField({ label, error, hint, ...input }: TextInputProps & { l
 }
 
 const styles = StyleSheet.create({
-  input: { minHeight: MIN_TOUCH + 4, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontSize: 16 },
+  input: {
+    minHeight: MIN_TOUCH + 4,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    fontSize: 16,
+  },
 });

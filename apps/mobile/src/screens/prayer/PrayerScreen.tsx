@@ -2,7 +2,16 @@ import { PRAYERS, type NotificationMode } from '@lawhi/shared';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Platform, StyleSheet, View } from 'react-native';
-import { AppText, Button, Card, MessageState, Notice, Screen, SectionTitle, Segmented } from '../../components/ui';
+import {
+  AppText,
+  Button,
+  Card,
+  MessageState,
+  Notice,
+  Screen,
+  SectionTitle,
+  Segmented,
+} from '../../components/ui';
 import { config } from '../../constants/config';
 import { radius, spacing } from '../../constants/theme';
 import { usePrayerDays } from '../../hooks/usePrayerDays';
@@ -44,7 +53,9 @@ export function PrayerScreen({ navigation }: TabScreenProps<'Prayer'>) {
         source: 'gps',
       });
     } else {
-      setLocationError(t(result.status === 'denied' ? 'prayer.locationDenied' : 'prayer.locationUnavailable'));
+      setLocationError(
+        t(result.status === 'denied' ? 'prayer.locationDenied' : 'prayer.locationUnavailable'),
+      );
     }
   };
 
@@ -66,15 +77,33 @@ export function PrayerScreen({ navigation }: TabScreenProps<'Prayer'>) {
             {place.latitude.toFixed(3)}, {place.longitude.toFixed(3)}
           </AppText>
           <View style={styles.actions}>
-            <Button title={t('prayer.useMyLocation')} variant="secondary" loading={locating} onPress={locate} style={{ flex: 1 }} />
-            <Button title={t('prayer.chooseCity')} variant="secondary" onPress={() => navigation.navigate('CityPicker')} style={{ flex: 1 }} />
+            <Button
+              title={t('prayer.useMyLocation')}
+              variant="secondary"
+              loading={locating}
+              onPress={locate}
+              style={{ flex: 1 }}
+            />
+            <Button
+              title={t('prayer.chooseCity')}
+              variant="secondary"
+              onPress={() => navigation.navigate('CityPicker')}
+              style={{ flex: 1 }}
+            />
           </View>
         </Card>
       ) : (
         <Card>
-          <MessageState title={t('prayer.noLocationTitle')} message={t('prayer.noLocationMessage')} />
+          <MessageState
+            title={t('prayer.noLocationTitle')}
+            message={t('prayer.noLocationMessage')}
+          />
           <Button title={t('prayer.useMyLocation')} loading={locating} onPress={locate} />
-          <Button title={t('prayer.chooseCity')} variant="secondary" onPress={() => navigation.navigate('CityPicker')} />
+          <Button
+            title={t('prayer.chooseCity')}
+            variant="secondary"
+            onPress={() => navigation.navigate('CityPicker')}
+          />
         </Card>
       )}
       {locationError ? <Notice tone="warning">{locationError}</Notice> : null}
@@ -97,10 +126,14 @@ export function PrayerScreen({ navigation }: TabScreenProps<'Prayer'>) {
                     isNext && { backgroundColor: theme.primary },
                   ]}
                 >
-                  <AppText style={[styles.name, isNext && { color: theme.onPrimary, fontWeight: '700' }]}>
+                  <AppText
+                    style={[styles.name, isNext && { color: theme.onPrimary, fontWeight: '700' }]}
+                  >
                     {t(`prayer.names.${key}`)}
                   </AppText>
-                  <AppText style={[styles.time, isNext && { color: theme.onPrimary, fontWeight: '700' }]}>
+                  <AppText
+                    style={[styles.time, isNext && { color: theme.onPrimary, fontWeight: '700' }]}
+                  >
                     {formatTime(at, locale)}
                   </AppText>
                 </View>
@@ -108,9 +141,14 @@ export function PrayerScreen({ navigation }: TabScreenProps<'Prayer'>) {
             })}
           </Card>
           <AppText variant="small">
-            {t('prayer.methodInfo', { method: t(`prayer.methods.${method}`) })} · {t('prayer.timezoneInfo', { timezone: timeZone })}
+            {t('prayer.methodInfo', { method: t(`prayer.methods.${method}`) })} ·{' '}
+            {t('prayer.timezoneInfo', { timezone: timeZone })}
           </AppText>
-          <Button title={t('prayer.changeMethod')} variant="secondary" onPress={() => navigation.navigate('Settings')} />
+          <Button
+            title={t('prayer.changeMethod')}
+            variant="secondary"
+            onPress={() => navigation.navigate('Settings')}
+          />
         </>
       ) : null}
 
@@ -124,19 +162,35 @@ export function PrayerScreen({ navigation }: TabScreenProps<'Prayer'>) {
             options={[
               { value: 'off', label: t('prayer.notificationModes.off') },
               { value: 'notification', label: t('prayer.notificationModes.notification') },
-              { value: 'adhan', label: t('prayer.notificationModes.adhan'), disabled: !config.hasAdhanSound },
+              {
+                value: 'adhan',
+                label: t('prayer.notificationModes.adhan'),
+                disabled: !config.hasAdhanSound,
+              },
             ]}
           />
-          {!config.hasAdhanSound ? <AppText variant="small">{t('prayer.adhanUnavailable')}</AppText> : null}
-          <AppText variant="small">{t('prayer.notificationsInfo', { prayers: PRAYERS.length })}</AppText>
+          {!config.hasAdhanSound ? (
+            <AppText variant="small">{t('prayer.adhanUnavailable')}</AppText>
+          ) : null}
+          <AppText variant="small">
+            {t('prayer.notificationsInfo', { prayers: PRAYERS.length })}
+          </AppText>
           {syncResult === 'permission-denied' ? (
             <>
               <Notice tone="warning">{t('prayer.notificationsDenied')}</Notice>
-              <Button title={t('common.openSettings')} variant="secondary" onPress={() => void Linking.openSettings()} />
+              <Button
+                title={t('common.openSettings')}
+                variant="secondary"
+                onPress={() => void Linking.openSettings()}
+              />
             </>
           ) : null}
-          {syncResult === 'no-location' ? <Notice tone="warning">{t('prayer.notificationsNeedLocation')}</Notice> : null}
-          {syncResult === 'scheduled' ? <Notice tone="success">{t('prayer.notificationsScheduled')}</Notice> : null}
+          {syncResult === 'no-location' ? (
+            <Notice tone="warning">{t('prayer.notificationsNeedLocation')}</Notice>
+          ) : null}
+          {syncResult === 'scheduled' ? (
+            <Notice tone="success">{t('prayer.notificationsScheduled')}</Notice>
+          ) : null}
         </>
       ) : (
         <Notice>{t('prayer.notificationsWebUnsupported')}</Notice>

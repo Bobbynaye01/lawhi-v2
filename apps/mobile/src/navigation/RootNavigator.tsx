@@ -8,14 +8,22 @@ import {
   useNavigation,
   type Theme,
 } from '@react-navigation/native';
-import { createNativeStackNavigator, type NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  createNativeStackNavigator,
+  type NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 import type { ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
 import { MIN_TOUCH } from '../constants/theme';
 import { useIsDark, useTheme } from '../hooks/useTheme';
 import { AccountScreen } from '../screens/account/AccountScreen';
-import { ForgotPasswordScreen, ResetPasswordScreen, SignInScreen, SignUpScreen } from '../screens/account/AuthScreens';
+import {
+  ForgotPasswordScreen,
+  ResetPasswordScreen,
+  SignInScreen,
+  SignUpScreen,
+} from '../screens/account/AuthScreens';
 import { AdhkarCategoryScreen } from '../screens/adhkar/AdhkarCategoryScreen';
 import { AdhkarHomeScreen } from '../screens/adhkar/AdhkarHomeScreen';
 import { TasbihScreen } from '../screens/adhkar/TasbihScreen';
@@ -62,7 +70,12 @@ function SettingsButton() {
       accessibilityRole="button"
       accessibilityLabel={t('settings.title')}
       onPress={() => navigation.navigate('Settings')}
-      style={{ minWidth: MIN_TOUCH, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' }}
+      style={{
+        minWidth: MIN_TOUCH,
+        minHeight: MIN_TOUCH,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
       <Ionicons name="settings-outline" size={22} color={theme.text} />
     </Pressable>
@@ -86,11 +99,19 @@ function Tabs() {
         headerRight: route.name === 'Home' ? () => <SettingsButton /> : undefined,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('app.name'), tabBarLabel: t('tabs.home') }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ title: t('app.name'), tabBarLabel: t('tabs.home') }}
+      />
       <Tab.Screen name="Quran" component={QuranHomeScreen} options={{ title: t('tabs.quran') }} />
       <Tab.Screen name="Prayer" component={PrayerScreen} options={{ title: t('tabs.prayer') }} />
       <Tab.Screen name="Qibla" component={QiblaScreen} options={{ title: t('tabs.qibla') }} />
-      <Tab.Screen name="Adhkar" component={AdhkarHomeScreen} options={{ title: t('tabs.adhkar') }} />
+      <Tab.Screen
+        name="Adhkar"
+        component={AdhkarHomeScreen}
+        options={{ title: t('tabs.adhkar') }}
+      />
     </Tab.Navigator>
   );
 }
@@ -113,7 +134,12 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
   };
 
   return (
-    <NavigationContainer ref={navigationRef} onReady={onReady} theme={navTheme} documentTitle={{ formatter: () => t('app.name') }}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={onReady}
+      theme={navTheme}
+      documentTitle={{ formatter: () => t('app.name') }}
+    >
       <Stack.Navigator
         screenOptions={{
           headerStyle: { backgroundColor: theme.surface },
@@ -123,25 +149,89 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
       >
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
         <Stack.Screen name="QuranReader" component={QuranReaderScreen} options={{ title: '' }} />
-        <Stack.Screen name="QuranSearch" component={QuranSearchScreen} options={{ title: t('quran.search') }} />
-        <Stack.Screen name="Bookmarks" component={BookmarksScreen} options={{ title: t('quran.bookmarks') }} />
-        <Stack.Screen name="AdhkarCategory" component={AdhkarCategoryScreen} options={{ title: '' }} />
-        <Stack.Screen name="Tasbih" component={TasbihScreen} options={{ title: t('adhkar.tasbih') }} />
-        <Stack.Screen name="Library" component={LibraryScreen} options={{ title: t('library.title') }} />
+        <Stack.Screen
+          name="QuranSearch"
+          component={QuranSearchScreen}
+          options={{ title: t('quran.search') }}
+        />
+        <Stack.Screen
+          name="Bookmarks"
+          component={BookmarksScreen}
+          options={{ title: t('quran.bookmarks') }}
+        />
+        <Stack.Screen
+          name="AdhkarCategory"
+          component={AdhkarCategoryScreen}
+          options={{ title: '' }}
+        />
+        <Stack.Screen
+          name="Tasbih"
+          component={TasbihScreen}
+          options={{ title: t('adhkar.tasbih') }}
+        />
+        <Stack.Screen
+          name="Library"
+          component={LibraryScreen}
+          options={{ title: t('library.title') }}
+        />
         <Stack.Screen name="BookDetail" component={BookDetailScreen} options={{ title: '' }} />
         <Stack.Screen name="BookChapter" component={BookChapterScreen} options={{ title: '' }} />
         <Stack.Screen name="PdfReader" component={PdfReaderScreen} options={{ title: '' }} />
-        <Stack.Screen name="Donations" component={DonationsScreen} options={{ title: t('donations.title') }} />
-        <Stack.Screen name="DonationForm" component={DonationFormScreen} options={{ title: t('donations.newDonation') }} />
-        <Stack.Screen name="DonationDetail" component={DonationDetailScreen} options={{ title: t('donations.detailTitle') }} />
-        <Stack.Screen name="MyDonations" component={MyDonationsScreen} options={{ title: t('donations.myDonations') }} />
-        <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: t('settings.title') }} />
-        <Stack.Screen name="CityPicker" component={CityPickerScreen} options={{ title: t('prayer.chooseCity') }} />
-        <Stack.Screen name="Account" component={AccountScreen} options={{ title: t('settings.account') }} />
-        <Stack.Screen name="SignIn" component={SignInScreen} options={{ title: t('auth.signIn') }} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} options={{ title: t('auth.createAccount') }} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: t('auth.forgotPassword') }} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ title: t('auth.newPassword') }} />
+        <Stack.Screen
+          name="Donations"
+          component={DonationsScreen}
+          options={{ title: t('donations.title') }}
+        />
+        <Stack.Screen
+          name="DonationForm"
+          component={DonationFormScreen}
+          options={{ title: t('donations.newDonation') }}
+        />
+        <Stack.Screen
+          name="DonationDetail"
+          component={DonationDetailScreen}
+          options={{ title: t('donations.detailTitle') }}
+        />
+        <Stack.Screen
+          name="MyDonations"
+          component={MyDonationsScreen}
+          options={{ title: t('donations.myDonations') }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ title: t('settings.title') }}
+        />
+        <Stack.Screen
+          name="CityPicker"
+          component={CityPickerScreen}
+          options={{ title: t('prayer.chooseCity') }}
+        />
+        <Stack.Screen
+          name="Account"
+          component={AccountScreen}
+          options={{ title: t('settings.account') }}
+        />
+        <Stack.Screen
+          name="SignIn"
+          component={SignInScreen}
+          options={{ title: t('auth.signIn') }}
+        />
+        <Stack.Screen
+          name="SignUp"
+          component={SignUpScreen}
+          options={{ title: t('auth.createAccount') }}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+          options={{ title: t('auth.forgotPassword') }}
+        />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPasswordScreen}
+          options={{ title: t('auth.newPassword') }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

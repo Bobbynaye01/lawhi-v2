@@ -19,10 +19,15 @@ const envSchema = z
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production') {
       for (const key of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] as const) {
-        if (!env[key]) ctx.addIssue({ code: 'custom', path: [key], message: 'required in production' });
+        if (!env[key])
+          ctx.addIssue({ code: 'custom', path: [key], message: 'required in production' });
       }
       if (env.LOCAL_STORAGE_DIR) {
-        ctx.addIssue({ code: 'custom', path: ['LOCAL_STORAGE_DIR'], message: 'not allowed in production' });
+        ctx.addIssue({
+          code: 'custom',
+          path: ['LOCAL_STORAGE_DIR'],
+          message: 'not allowed in production',
+        });
       }
     }
   });

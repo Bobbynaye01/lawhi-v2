@@ -31,7 +31,10 @@ export async function handleAuthLink(url: string): Promise<AuthLinkResult> {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) return 'invalid';
   } else if (accessToken && refreshToken) {
-    const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    const { error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
     if (error) return 'invalid';
   } else {
     return 'ignored';

@@ -24,7 +24,13 @@ const sizes: Record<Variant, object> = {
   body: { fontSize: 16 },
   muted: { fontSize: 15 },
   small: { fontSize: 13 },
-  arabic: { fontSize: 22, fontFamily: fonts.arabic, lineHeight: 42, writingDirection: 'rtl', textAlign: 'right' },
+  arabic: {
+    fontSize: 22,
+    fontFamily: fonts.arabic,
+    lineHeight: 42,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
 };
 
 export function AppText({ variant = 'body', style, ...props }: TextProps & { variant?: Variant }) {
@@ -48,7 +54,10 @@ export function Screen({
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
-        <ScrollView contentContainerStyle={[styles.content, contentStyle]} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={[styles.content, contentStyle]}
+          keyboardShouldPersistTaps="handled"
+        >
           {children}
         </ScrollView>
       ) : (
@@ -61,7 +70,9 @@ export function Screen({
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useTheme();
   return (
-    <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }, style]}>
+    <View
+      style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }, style]}
+    >
       {children}
     </View>
   );
@@ -98,12 +109,20 @@ export function Button({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: background, borderColor: theme.primary, opacity: inactive ? 0.5 : pressed ? 0.8 : 1 },
+        {
+          backgroundColor: background,
+          borderColor: theme.primary,
+          opacity: inactive ? 0.5 : pressed ? 0.8 : 1,
+        },
         variant === 'secondary' && { borderWidth: 1.5 },
         style,
       ]}
     >
-      {loading ? <ActivityIndicator color={color} /> : <Text style={[styles.buttonText, { color }]}>{title}</Text>}
+      {loading ? (
+        <ActivityIndicator color={color} />
+      ) : (
+        <Text style={[styles.buttonText, { color }]}>{title}</Text>
+      )}
     </Pressable>
   );
 }
@@ -158,7 +177,11 @@ export function Segmented<T extends string>({
 }) {
   const theme = useTheme();
   return (
-    <View accessibilityRole="radiogroup" accessibilityLabel={label} style={[styles.segmented, { borderColor: theme.border }]}>
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={label}
+      style={[styles.segmented, { borderColor: theme.border }]}
+    >
       {options.map((o) => {
         const selected = o.value === value;
         return (
@@ -168,9 +191,18 @@ export function Segmented<T extends string>({
             accessibilityState={{ selected, disabled: o.disabled }}
             disabled={o.disabled}
             onPress={() => onChange(o.value)}
-            style={[styles.segment, selected && { backgroundColor: theme.primary }, o.disabled && { opacity: 0.4 }]}
+            style={[
+              styles.segment,
+              selected && { backgroundColor: theme.primary },
+              o.disabled && { opacity: 0.4 },
+            ]}
           >
-            <Text style={{ color: selected ? theme.onPrimary : theme.text, fontWeight: selected ? '600' : '400' }}>
+            <Text
+              style={{
+                color: selected ? theme.onPrimary : theme.text,
+                fontWeight: selected ? '600' : '400',
+              }}
+            >
               {o.label}
             </Text>
           </Pressable>
@@ -182,7 +214,11 @@ export function Segmented<T extends string>({
 
 export function SectionTitle({ children }: { children: string }) {
   return (
-    <AppText variant="heading" accessibilityRole="header" style={{ marginTop: spacing.lg, marginBottom: spacing.sm }}>
+    <AppText
+      variant="heading"
+      accessibilityRole="header"
+      style={{ marginTop: spacing.lg, marginBottom: spacing.sm }}
+    >
       {children}
     </AppText>
   );
@@ -217,7 +253,10 @@ export function MessageState({
   const theme = useTheme();
   return (
     <View style={styles.centered} accessibilityLiveRegion="polite">
-      <AppText variant="heading" style={{ textAlign: 'center', color: tone === 'error' ? theme.danger : theme.text }}>
+      <AppText
+        variant="heading"
+        style={{ textAlign: 'center', color: tone === 'error' ? theme.danger : theme.text }}
+      >
         {title}
       </AppText>
       {message ? (
@@ -226,15 +265,27 @@ export function MessageState({
         </AppText>
       ) : null}
       {actionLabel && onAction ? (
-        <Button title={actionLabel} onPress={onAction} variant="secondary" style={{ marginTop: spacing.lg }} />
+        <Button
+          title={actionLabel}
+          onPress={onAction}
+          variant="secondary"
+          style={{ marginTop: spacing.lg }}
+        />
       ) : null}
     </View>
   );
 }
 
-export function Notice({ children, tone = 'info' }: { children: string; tone?: 'info' | 'warning' | 'success' }) {
+export function Notice({
+  children,
+  tone = 'info',
+}: {
+  children: string;
+  tone?: 'info' | 'warning' | 'success';
+}) {
   const theme = useTheme();
-  const color = tone === 'warning' ? theme.warning : tone === 'success' ? theme.success : theme.primary;
+  const color =
+    tone === 'warning' ? theme.warning : tone === 'success' ? theme.success : theme.primary;
   return (
     <View
       accessibilityRole="alert"
@@ -268,7 +319,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   segmented: { flexDirection: 'row', borderWidth: 1, borderRadius: radius.md, overflow: 'hidden' },
-  segment: { flex: 1, minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.sm },
+  segment: {
+    flex: 1,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
   notice: { borderStartWidth: 4, borderRadius: radius.sm, padding: spacing.md },
 });

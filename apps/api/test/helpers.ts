@@ -15,13 +15,22 @@ export interface TestContext {
   app: NestExpressApplication;
   prisma: PrismaService;
   /** Signs an access token shaped like Supabase's (RS256, aud=authenticated). */
-  token: (sub: string, email?: string, overrides?: { expired?: boolean; foreign?: boolean }) => Promise<string>;
+  token: (
+    sub: string,
+    email?: string,
+    overrides?: { expired?: boolean; foreign?: boolean },
+  ) => Promise<string>;
   newUserId: () => string;
 }
 
 /** Disables rate limiting for suites that legitimately send many requests. */
 const unlimitedThrottler = {
-  increment: async () => ({ totalHits: 1, timeToExpire: 60, isBlocked: false, timeToBlockExpire: 0 }),
+  increment: async () => ({
+    totalHits: 1,
+    timeToExpire: 60,
+    isBlocked: false,
+    timeToBlockExpire: 0,
+  }),
 };
 
 export async function createTestApp(options: { rateLimit?: boolean } = {}): Promise<TestContext> {
@@ -42,7 +51,10 @@ export async function createTestApp(options: { rateLimit?: boolean } = {}): Prom
   await app.init();
 
   const token: TestContext['token'] = async (sub, email, overrides = {}) => {
-    const jwt = new SignJWT({ email: email ?? `${sub.slice(0, 8)}@test.lawhi`, role: 'authenticated' })
+    const jwt = new SignJWT({
+      email: email ?? `${sub.slice(0, 8)}@test.lawhi`,
+      role: 'authenticated',
+    })
       .setProtectedHeader({ alg: 'RS256', kid: 'test-key' })
       .setSubject(sub)
       .setAudience('authenticated')

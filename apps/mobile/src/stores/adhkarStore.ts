@@ -43,7 +43,9 @@ export const useAdhkarStore = create<AdhkarState>()(
         },
         toggleFavorite: (id) =>
           set((s) => ({
-            favorites: s.favorites.includes(id) ? s.favorites.filter((f) => f !== id) : [...s.favorites, id],
+            favorites: s.favorites.includes(id)
+              ? s.favorites.filter((f) => f !== id)
+              : [...s.favorites, id],
           })),
         incrementTasbih: () => set((s) => ({ tasbih: s.tasbih + 1 })),
         resetTasbih: () => set({ tasbih: 0 }),

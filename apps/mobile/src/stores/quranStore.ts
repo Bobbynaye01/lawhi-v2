@@ -25,14 +25,21 @@ export const useQuranStore = create<QuranState>()(
       lastRead: {},
       bookmarks: [],
       saveLastRead: (riwaya, ref) =>
-        set((s) => ({ lastRead: { ...s.lastRead, [riwaya]: { ...ref, at: new Date().toISOString() } } })),
+        set((s) => ({
+          lastRead: { ...s.lastRead, [riwaya]: { ...ref, at: new Date().toISOString() } },
+        })),
       toggleBookmark: (riwaya, ref) =>
         set((s) =>
           s.bookmarks.some((b) => same(b, riwaya, ref))
             ? { bookmarks: s.bookmarks.filter((b) => !same(b, riwaya, ref)) }
             : {
                 bookmarks: [
-                  { riwaya, surah: ref.surah, verse: ref.verse, createdAt: new Date().toISOString() },
+                  {
+                    riwaya,
+                    surah: ref.surah,
+                    verse: ref.verse,
+                    createdAt: new Date().toISOString(),
+                  },
                   ...s.bookmarks,
                 ],
               },

@@ -5,3 +5,10 @@ dist
 coverage
 pnpm-lock.yaml
 packages/quran-data/sources
+packages/quran-data/data
+packages/content/data
+apps/api/src/generated
+apps/api/prisma/migrations
+apps/mobile/android
+apps/mobile/ios
+**/dist

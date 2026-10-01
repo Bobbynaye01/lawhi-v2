@@ -7,7 +7,16 @@ import { useTranslation } from 'react-i18next';
 import { Platform, View } from 'react-native';
 import { confirmAsync } from '../../components/ActionSheet';
 import { FormField } from '../../components/FormField';
-import { AppText, Button, Card, LoadingState, MessageState, Notice, Screen, SectionTitle } from '../../components/ui';
+import {
+  AppText,
+  Button,
+  Card,
+  LoadingState,
+  MessageState,
+  Notice,
+  Screen,
+  SectionTitle,
+} from '../../components/ui';
 import { spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import type { RootScreenProps } from '../../navigation/types';
@@ -17,7 +26,11 @@ import { errorKey, formatDateTime, localized, useLocale } from '../../utils/loca
 const MAX_PROOF_BYTES = 5 * 1024 * 1024;
 
 export function statusColor(status: DonationStatus, theme: ReturnType<typeof useTheme>) {
-  return status === 'confirmed' ? theme.success : status === 'rejected' || status === 'cancelled' ? theme.danger : theme.warning;
+  return status === 'confirmed'
+    ? theme.success
+    : status === 'rejected' || status === 'cancelled'
+      ? theme.danger
+      : theme.warning;
 }
 
 interface PickedFile {
@@ -42,7 +55,10 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
   const locale = useLocale();
   const queryClient = useQueryClient();
   const id = route.params.donationId;
-  const donation = useQuery({ queryKey: ['donations', 'detail', id], queryFn: () => api.donation(id) });
+  const donation = useQuery({
+    queryKey: ['donations', 'detail', id],
+    queryFn: () => api.donation(id),
+  });
   const [reference, setReference] = useState('');
   const [fileError, setFileError] = useState<string | null>(null);
 
@@ -50,8 +66,14 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
     queryClient.setQueryData(['donations', 'detail', id], data);
     void queryClient.invalidateQueries({ queryKey: ['donations', 'mine'] });
   };
-  const submitReference = useMutation({ mutationFn: (ref: string) => api.submitReference(id, ref), onSuccess: onUpdated });
-  const uploadProof = useMutation({ mutationFn: (file: PickedFile) => api.uploadProof(id, toFormData(file)), onSuccess: onUpdated });
+  const submitReference = useMutation({
+    mutationFn: (ref: string) => api.submitReference(id, ref),
+    onSuccess: onUpdated,
+  });
+  const uploadProof = useMutation({
+    mutationFn: (file: PickedFile) => api.uploadProof(id, toFormData(file)),
+    onSuccess: onUpdated,
+  });
   const cancel = useMutation({ mutationFn: () => api.cancelDonation(id), onSuccess: onUpdated });
 
   if (donation.isPending) return <LoadingState />;
@@ -76,7 +98,10 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+    });
     const asset = result.canceled ? null : result.assets[0];
     if (!asset) return;
     send({
@@ -89,10 +114,19 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
   };
 
   const pickPdf = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf', copyToCacheDirectory: true });
+    const result = await DocumentPicker.getDocumentAsync({
+      type: 'application/pdf',
+      copyToCacheDirectory: true,
+    });
     const asset = result.canceled ? null : result.assets[0];
     if (!asset) return;
-    send({ uri: asset.uri, name: asset.name, type: asset.mimeType ?? 'application/pdf', size: asset.size, webFile: asset.file });
+    send({
+      uri: asset.uri,
+      name: asset.name,
+      type: asset.mimeType ?? 'application/pdf',
+      size: asset.size,
+      webFile: asset.file,
+    });
   };
 
   const askCancel = async () => {
@@ -117,7 +151,9 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
         </AppText>
         <AppText>{t(`donations.statusHelp.${d.status}`)}</AppText>
         {d.status === 'rejected' && d.rejectionReason ? (
-          <AppText variant="muted">{t('donations.rejectionReason', { reason: d.rejectionReason })}</AppText>
+          <AppText variant="muted">
+            {t('donations.rejectionReason', { reason: d.rejectionReason })}
+          </AppText>
         ) : null}
       </Card>
 
@@ -131,8 +167,16 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
           {d.paymentMethod.phoneNumber ? ` · ${d.paymentMethod.phoneNumber}` : ''}
         </AppText>
         <AppText variant="small">{formatDateTime(d.createdAt, locale)}</AppText>
-        {d.reference ? <AppText variant="small">{t('donations.referenceValue', { reference: d.reference })}</AppText> : null}
-        {d.hasProof ? <AppText variant="small" style={{ color: theme.success }}>{t('donations.proofReceived')}</AppText> : null}
+        {d.reference ? (
+          <AppText variant="small">
+            {t('donations.referenceValue', { reference: d.reference })}
+          </AppText>
+        ) : null}
+        {d.hasProof ? (
+          <AppText variant="small" style={{ color: theme.success }}>
+            {t('donations.proofReceived')}
+          </AppText>
+        ) : null}
       </Card>
 
       {open ? (
@@ -154,12 +198,27 @@ export function DonationDetailScreen({ route }: RootScreenProps<'DonationDetail'
               loading={submitReference.isPending}
               onPress={() => submitReference.mutate(reference.trim())}
             />
-            <Button title={t('donations.attachImage')} variant="secondary" loading={uploadProof.isPending} onPress={() => void pickImage()} />
-            <Button title={t('donations.attachPdf')} variant="secondary" loading={uploadProof.isPending} onPress={() => void pickPdf()} />
+            <Button
+              title={t('donations.attachImage')}
+              variant="secondary"
+              loading={uploadProof.isPending}
+              onPress={() => void pickImage()}
+            />
+            <Button
+              title={t('donations.attachPdf')}
+              variant="secondary"
+              loading={uploadProof.isPending}
+              onPress={() => void pickPdf()}
+            />
           </View>
           {fileError ? <Notice tone="warning">{fileError}</Notice> : null}
           {busyError ? <Notice tone="warning">{t(errorKey(busyError))}</Notice> : null}
-          <Button title={t('donations.cancelDonation')} variant="danger" loading={cancel.isPending} onPress={() => void askCancel()} />
+          <Button
+            title={t('donations.cancelDonation')}
+            variant="danger"
+            loading={cancel.isPending}
+            onPress={() => void askCancel()}
+          />
         </>
       ) : null}
     </Screen>

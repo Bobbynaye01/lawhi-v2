@@ -14,7 +14,8 @@ export class LoggingInterceptor implements NestInterceptor {
     const path = request.originalUrl.split('?')[0];
     return next.handle().pipe(
       tap({
-        next: () => this.log(request.method, path, http.getResponse<Response>().statusCode, started),
+        next: () =>
+          this.log(request.method, path, http.getResponse<Response>().statusCode, started),
         error: () => this.log(request.method, path, 'error', started),
       }),
     );

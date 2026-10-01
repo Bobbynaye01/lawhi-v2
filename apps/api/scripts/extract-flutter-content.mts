@@ -226,18 +226,57 @@ const str = (v: Value | undefined) => (typeof v === 'string' ? v : null);
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 const flutterRoot = process.argv[2];
-if (!flutterRoot) throw new Error('Usage: node scripts/extract-flutter-content.mts <flutter-project>');
+if (!flutterRoot)
+  throw new Error('Usage: node scripts/extract-flutter-content.mts <flutter-project>');
 const feat = join(flutterRoot, 'lib', 'features');
-const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'packages', 'content', 'data');
+const outDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+  '..',
+  'packages',
+  'content',
+  'data',
+);
 
 // Adhkar
 const adhkarScope = load(join(feat, 'adhkar/presentation/adhkar_screen.dart'));
 const adhkarCategories = [
-  { id: 'morning', list: '_sabah', icon: 'sunny', titleFr: 'Adhkar du matin', titleEn: 'Morning adhkar' },
-  { id: 'evening', list: '_masaa', icon: 'night', titleFr: 'Adhkar du soir', titleEn: 'Evening adhkar' },
-  { id: 'sleep', list: '_nawm', icon: 'bed', titleFr: 'Adhkar du coucher', titleEn: 'Bedtime adhkar' },
-  { id: 'prayer', list: '_salah', icon: 'mosque', titleFr: 'Adhkar de la prière', titleEn: 'Prayer adhkar' },
-  { id: 'after-prayer', list: '_baadSalah', icon: 'sparkle', titleFr: 'Adhkar après la prière', titleEn: 'After-prayer adhkar' },
+  {
+    id: 'morning',
+    list: '_sabah',
+    icon: 'sunny',
+    titleFr: 'Adhkar du matin',
+    titleEn: 'Morning adhkar',
+  },
+  {
+    id: 'evening',
+    list: '_masaa',
+    icon: 'night',
+    titleFr: 'Adhkar du soir',
+    titleEn: 'Evening adhkar',
+  },
+  {
+    id: 'sleep',
+    list: '_nawm',
+    icon: 'bed',
+    titleFr: 'Adhkar du coucher',
+    titleEn: 'Bedtime adhkar',
+  },
+  {
+    id: 'prayer',
+    list: '_salah',
+    icon: 'mosque',
+    titleFr: 'Adhkar de la prière',
+    titleEn: 'Prayer adhkar',
+  },
+  {
+    id: 'after-prayer',
+    list: '_baadSalah',
+    icon: 'sparkle',
+    titleFr: 'Adhkar après la prière',
+    titleEn: 'After-prayer adhkar',
+  },
 ];
 // `_data` maps each Arabic category title to its list: { 'أذكار الصباح': _sabah, ... }
 const rawData = adhkarScope.get('_data') as Record<string, { __ref: string }>;
@@ -247,7 +286,11 @@ const adhkar = adhkarCategories.map((cat, index) => {
   return {
     id: cat.id,
     kind: 'adhkar',
-    titleAr: titleByList.get(cat.list) ?? (() => { throw new Error(`No title for ${cat.list}`); })(),
+    titleAr:
+      titleByList.get(cat.list) ??
+      (() => {
+        throw new Error(`No title for ${cat.list}`);
+      })(),
     titleFr: cat.titleFr,
     titleEn: cat.titleEn,
     icon: cat.icon,
@@ -270,12 +313,42 @@ const adhkar = adhkarCategories.map((cat, index) => {
 // Ad'iya
 const adiyaScope = load(join(feat, 'adiya/presentation/adiya_screen.dart'));
 const adiyaMeta: Record<string, { id: string; icon: string; titleFr: string; titleEn: string }> = {
-  _quranAdiya: { id: 'quranic', icon: 'book', titleFr: 'Invocations coraniques', titleEn: 'Quranic supplications' },
-  _karbAdiya: { id: 'distress', icon: 'heart', titleFr: 'Invocations de la détresse', titleEn: 'Supplications in distress' },
-  _istikharaAdiya: { id: 'istikhara', icon: 'help', titleFr: 'Invocation de l’istikhara', titleEn: 'Istikhara supplication' },
-  _safarAdiya: { id: 'travel', icon: 'plane', titleFr: 'Invocations du voyage', titleEn: 'Travel supplications' },
-  _sihhahAdiya: { id: 'health', icon: 'healing', titleFr: 'Invocations pour la santé', titleEn: 'Supplications for health' },
-  _mutanawwiahAdiya: { id: 'various', icon: 'hands', titleFr: 'Invocations diverses', titleEn: 'Various supplications' },
+  _quranAdiya: {
+    id: 'quranic',
+    icon: 'book',
+    titleFr: 'Invocations coraniques',
+    titleEn: 'Quranic supplications',
+  },
+  _karbAdiya: {
+    id: 'distress',
+    icon: 'heart',
+    titleFr: 'Invocations de la détresse',
+    titleEn: 'Supplications in distress',
+  },
+  _istikharaAdiya: {
+    id: 'istikhara',
+    icon: 'help',
+    titleFr: 'Invocation de l’istikhara',
+    titleEn: 'Istikhara supplication',
+  },
+  _safarAdiya: {
+    id: 'travel',
+    icon: 'plane',
+    titleFr: 'Invocations du voyage',
+    titleEn: 'Travel supplications',
+  },
+  _sihhahAdiya: {
+    id: 'health',
+    icon: 'healing',
+    titleFr: 'Invocations pour la santé',
+    titleEn: 'Supplications for health',
+  },
+  _mutanawwiahAdiya: {
+    id: 'various',
+    icon: 'hands',
+    titleFr: 'Invocations diverses',
+    titleEn: 'Various supplications',
+  },
 };
 const adiyaCategories = adiyaScope.get('_categories') as Value[];
 const adiya = adiyaCategories.map((raw, index) => {
@@ -373,7 +446,10 @@ const TITLES: Record<string, { fr: string; en: string }> = {
   muslim: { fr: 'Sahih Muslim', en: 'Sahih Muslim' },
   riyadh: { fr: 'Riyad as-Salihin', en: 'Riyad as-Salihin' },
   nawawi40: { fr: 'Les quarante hadiths d’an-Nawawi', en: 'An-Nawawi’s Forty Hadith' },
-  hisn: { fr: 'La citadelle du musulman (Hisn al-Muslim)', en: 'Fortress of the Muslim (Hisn al-Muslim)' },
+  hisn: {
+    fr: 'La citadelle du musulman (Hisn al-Muslim)',
+    en: 'Fortress of the Muslim (Hisn al-Muslim)',
+  },
   bulugh: { fr: 'Bulugh al-Maram', en: 'Bulugh al-Maram' },
   adhkar_nawawi: { fr: 'Al-Adhkar d’an-Nawawi', en: 'Al-Adhkar by an-Nawawi' },
 };
@@ -398,7 +474,8 @@ const books = pdfBooks.map((pdf) => {
     chapters: text.chapters,
   };
 });
-if (textById.size > 0) throw new Error(`Text books without catalogue entry: ${[...textById.keys()].join(', ')}`);
+if (textById.size > 0)
+  throw new Error(`Text books without catalogue entry: ${[...textById.keys()].join(', ')}`);
 
 const counts = {
   adhkarCategories: adhkar.length,
@@ -409,7 +486,13 @@ const counts = {
   textBooks: texts.length,
   textEntries: texts.reduce((n, b) => n + b.chapters.reduce((m, c) => m + c.entries.length, 0), 0),
 };
-const header = { source: 'Lawhi Flutter app (lib/features), extracted verbatim', extractedAt: '2026-10-01' };
-writeFileSync(join(outDir, 'adhkar.json'), JSON.stringify({ ...header, categories: [...adhkar, ...adiya] }, null, 1));
+const header = {
+  source: 'Lawhi Flutter app (lib/features), extracted verbatim',
+  extractedAt: '2026-10-01',
+};
+writeFileSync(
+  join(outDir, 'adhkar.json'),
+  JSON.stringify({ ...header, categories: [...adhkar, ...adiya] }, null, 1),
+);
 writeFileSync(join(outDir, 'library.json'), JSON.stringify({ ...header, books }, null, 1));
 console.warn(JSON.stringify(counts));

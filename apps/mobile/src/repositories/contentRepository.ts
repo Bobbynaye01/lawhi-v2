@@ -71,7 +71,8 @@ let reciters: Reciter[] | null = null;
 /** Validated religious content bundled with the app (packages/content), available offline. */
 export const contentRepository = {
   categories(kind?: DhikrCategory['kind']): DhikrCategory[] {
-    adhkar ??= (require('@lawhi/content/adhkar.json') as { categories: DhikrCategory[] }).categories;
+    adhkar ??= (require('@lawhi/content/adhkar.json') as { categories: DhikrCategory[] })
+      .categories;
     return kind ? adhkar.filter((c) => c.kind === kind) : adhkar;
   },
 
@@ -95,6 +96,8 @@ export const contentRepository = {
   },
 
   reciter(id: string): Reciter | undefined {
-    return this.reciters('hafs').concat(this.reciters('warsh')).find((r) => r.id === id);
+    return this.reciters('hafs')
+      .concat(this.reciters('warsh'))
+      .find((r) => r.id === id);
   },
 };

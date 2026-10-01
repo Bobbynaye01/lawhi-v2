@@ -32,7 +32,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const payload =
         typeof body === 'string'
           ? { error: body }
-          : { error: (body as { error?: string; message?: unknown }).error ?? 'error', ...(body as object) };
+          : {
+              error: (body as { error?: string; message?: unknown }).error ?? 'error',
+              ...(body as object),
+            };
       delete (payload as { statusCode?: number }).statusCode;
       response.status(status).json({ statusCode: status, ...payload });
       return;

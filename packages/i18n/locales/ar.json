@@ -192,7 +192,8 @@
     "pageOf": "الصفحة {{page}} من {{total}}",
     "cannotOpen": "تعذّر فتح هذا الملف",
     "cannotOpenHint": "احذفه ثم نزّله من جديد.",
-    "webPdfTitle": "يُفتح ملف PDF في عارض المتصفح."
+    "webPdfTitle": "يُفتح ملف PDF في عارض المتصفح.",
+    "nativeReaderUnavailable": "قارئ PDF المدمج غير متاح في Expo Go: سيُفتح الكتاب في عارض الهاتف."
   },
   "donations": {
     "title": "التبرعات",

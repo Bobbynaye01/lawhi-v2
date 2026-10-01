@@ -192,7 +192,8 @@
     "pageOf": "Page {{page}} / {{total}}",
     "cannotOpen": "This PDF cannot be opened",
     "cannotOpenHint": "Delete it and download it again.",
-    "webPdfTitle": "The PDF opens in your browser's viewer."
+    "webPdfTitle": "The PDF opens in your browser's viewer.",
+    "nativeReaderUnavailable": "The built-in PDF reader is not available in Expo Go: the book opens in the phone's viewer."
   },
   "donations": {
     "title": "Donations",

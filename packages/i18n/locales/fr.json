@@ -192,7 +192,8 @@
     "pageOf": "Page {{page}} / {{total}}",
     "cannotOpen": "Impossible d’ouvrir ce PDF",
     "cannotOpenHint": "Supprimez-le puis téléchargez-le à nouveau.",
-    "webPdfTitle": "Le PDF s’ouvre dans le lecteur de votre navigateur."
+    "webPdfTitle": "Le PDF s’ouvre dans le lecteur de votre navigateur.",
+    "nativeReaderUnavailable": "Le lecteur PDF intégré n'est pas disponible dans Expo Go : le livre s'ouvre dans le lecteur du téléphone."
   },
   "donations": {
     "title": "Dons",

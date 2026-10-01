@@ -1,7 +1,7 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
-import Pdf from 'react-native-pdf';
+import { Linking, StyleSheet, UIManager, View } from 'react-native';
+import type { PdfProps } from 'react-native-pdf';
 import { AppText, MessageState, Screen } from '../../components/ui';
 import { spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
@@ -10,7 +10,23 @@ import { contentRepository } from '../../repositories/contentRepository';
 import { useLibraryStore } from '../../stores/libraryStore';
 import { localized, useLocale } from '../../utils/localize';
 
-/** Native PDF reader for downloaded books (needs a development build, not Expo Go). */
+/**
+ * react-native-pdf is a native module: present in development/production
+ * builds, absent from Expo Go. Loaded lazily so the app never crashes at
+ * startup; without it the PDF opens in the phone's own viewer.
+ */
+function loadNativePdf(): ComponentType<PdfProps> | null {
+  if (!UIManager.getViewManagerConfig?.('RNPDFPdfView')) return null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return (require('react-native-pdf') as { default: ComponentType<PdfProps> }).default;
+  } catch {
+    return null;
+  }
+}
+const Pdf = loadNativePdf();
+
+/** In-app PDF reader for downloaded books, with page resume. */
 export function PdfReaderScreen({ route, navigation }: RootScreenProps<'PdfReader'>) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -29,6 +45,16 @@ export function PdfReaderScreen({ route, navigation }: RootScreenProps<'PdfReade
         title: locale === 'ar' ? book.titleAr : localized(book, 'title', locale),
       });
   }, [navigation, book, locale]);
+
+  if (!Pdf) {
+    return (
+      <MessageState
+        title={t('library.nativeReaderUnavailable')}
+        actionLabel={book?.pdfUrl ? t('library.openPdf') : undefined}
+        onAction={book?.pdfUrl ? () => void Linking.openURL(book.pdfUrl!) : undefined}
+      />
+    );
+  }
 
   if (!download || failed) {
     return (

@@ -1,4 +1,10 @@
-import type { DonationStatus, PaymentOperator } from '@lawhi/shared';
+import type {
+  CauseStatus,
+  DonationStatus,
+  DonationSummary,
+  PaymentOperator,
+  UpdateDonationSummaryInput,
+} from '@lawhi/shared';
 import { createClient } from '@supabase/supabase-js';
 
 const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -19,9 +25,14 @@ export class ApiError extends Error {
   }
 }
 
+/** Image URLs stored on disk in development are relative to the API. */
+export function mediaUrl(url: string): string {
+  return url.startsWith('/') ? `${API_URL}${url}` : url;
+}
+
 async function request<T>(
   path: string,
-  init: { method?: string; body?: unknown } = {},
+  init: { method?: string; body?: unknown; form?: FormData } = {},
 ): Promise<T> {
   const session = (await supabase?.auth.getSession())?.data.session;
   if (!session) throw new ApiError(401, 'unauthenticated');
@@ -33,7 +44,7 @@ async function request<T>(
         Authorization: `Bearer ${session.access_token}`,
         ...(init.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       },
-      body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
+      body: init.form ?? (init.body !== undefined ? JSON.stringify(init.body) : undefined),
     });
   } catch {
     throw new ApiError(0, 'network_error');
@@ -97,10 +108,20 @@ export interface CauseRow {
   descriptionFr: string;
   descriptionEn: string;
   goalAmount: number | null;
+  collectedAmount: number;
+  status: CauseStatus;
+  /** ISO date-time at midnight UTC, or null. */
+  eventDate: string | null;
+  imageUrl: string | null;
   featured: boolean;
   active: boolean;
   sortOrder: number;
 }
+
+/** What the API accepts when creating or editing a cause (date as YYYY-MM-DD). */
+export type CauseInput = Omit<CauseRow, 'id' | 'slug' | 'imageUrl' | 'eventDate'> & {
+  eventDate: string | null;
+};
 
 export interface Stats {
   currency: 'MRU';
@@ -164,16 +185,27 @@ export const adminApi = {
     body: Partial<Pick<PaymentMethodRow, 'phoneNumber' | 'instructions' | 'enabled' | 'name'>>,
   ) => request<PaymentMethodRow>(`/admin/payment-methods/${id}`, { method: 'PATCH', body }),
   causes: () => request<CauseRow[]>('/admin/causes'),
-  createCause: (body: Omit<CauseRow, 'id'>) =>
+  createCause: (body: CauseInput & { slug: string }) =>
     request<CauseRow>('/admin/causes', { method: 'POST', body }),
-  updateCause: (id: string, body: Partial<Omit<CauseRow, 'id' | 'slug'>>) =>
+  updateCause: (id: string, body: Partial<CauseInput>) =>
     request<CauseRow>(`/admin/causes/${id}`, { method: 'PATCH', body }),
-  setPresets: (presets: number[]) =>
-    request<{ presets: number[] }>('/admin/donation-presets', { method: 'PUT', body: { presets } }),
-  publicConfig: async () => {
-    const response = await fetch(`${API_URL}/api/settings`);
-    return (await response.json()) as { donations: { presets: number[] } };
+  /** Deletes the cause, or archives it when donations already reference it. */
+  deleteCause: (id: string) =>
+    request<{ deleted: boolean; archived: boolean }>(`/admin/causes/${id}`, { method: 'DELETE' }),
+  uploadCauseImage: (id: string, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return request<CauseRow>(`/admin/causes/${id}/image`, { method: 'POST', form });
   },
+  removeCauseImage: (id: string) =>
+    request<CauseRow>(`/admin/causes/${id}/image`, { method: 'DELETE' }),
+  summary: async (): Promise<DonationSummary> => {
+    const response = await fetch(`${API_URL}/api/donations/summary`);
+    if (!response.ok) throw new ApiError(response.status, 'unknown_error');
+    return (await response.json()) as DonationSummary;
+  },
+  updateSummary: (body: UpdateDonationSummaryInput) =>
+    request<DonationSummary>('/admin/donations-summary', { method: 'PUT', body }),
 };
 
 const MESSAGES: Record<string, string> = {
@@ -188,6 +220,12 @@ const MESSAGES: Record<string, string> = {
   validation_failed:
     'Données invalides (vérifiez le numéro : 8 chiffres commençant par 2, 3 ou 4).',
   rate_limited: 'Trop de requêtes, patientez une minute.',
+  cause_not_found: 'Ce projet n’existe plus. Rechargez la page.',
+  cause_slug_taken: 'Cet identifiant est déjà utilisé par un autre projet.',
+  image_too_large: 'Image trop lourde (2 Mo maximum).',
+  image_type_not_allowed: 'Format non accepté : JPG, PNG ou WebP uniquement.',
+  image_missing: 'Choisissez une image.',
+  image_storage_unavailable: 'Le stockage des images n’est pas configuré sur le serveur.',
 };
 
 export function errorMessage(error: unknown): string {

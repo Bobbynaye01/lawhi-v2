@@ -9,6 +9,7 @@ import { DonationDetailPage } from './pages/DonationDetailPage';
 import { DonationsPage } from './pages/DonationsPage';
 import { LoginPage } from './pages/LoginPage';
 import { PaymentMethodsPage } from './pages/PaymentMethodsPage';
+import { SummaryPage } from './pages/SummaryPage';
 
 function useSession() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -66,7 +67,8 @@ export function App() {
         </NavLink>
         <NavLink to="/donations">Dons</NavLink>
         <NavLink to="/payment-methods">Moyens de paiement</NavLink>
-        <NavLink to="/causes">Projets & montants</NavLink>
+        <NavLink to="/summary">Solde & Bankily</NavLink>
+        <NavLink to="/causes">Projets & événements</NavLink>
         <div className="spacer" />
         <span className="muted small">{session.user.email}</span>
         <button className="link" onClick={() => void supabase?.auth.signOut()}>
@@ -82,6 +84,7 @@ export function App() {
             element={<DonationDetailPage currentUserId={session.user.id} />}
           />
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+          <Route path="/summary" element={<SummaryPage />} />
           <Route path="/causes" element={<CausesPage />} />
           <Route path="*" element={<p>Page introuvable.</p>} />
         </Routes>

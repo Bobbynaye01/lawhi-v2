@@ -34,12 +34,12 @@ export function CityPickerScreen({ navigation }: RootScreenProps<'CityPicker'>) 
           value={query}
           onChangeText={setQuery}
           placeholder={t('prayer.cityPlaceholder')}
-          placeholderTextColor={theme.textMuted}
+          placeholderTextColor={theme.muted}
           accessibilityLabel={t('prayer.chooseCity')}
           autoFocus
           style={[
             styles.input,
-            { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface },
+            { color: theme.textPrimary, borderColor: theme.border, backgroundColor: theme.surface },
           ]}
         />
         {!isApiConfigured ? <Notice tone="warning">{t('errors.api_not_configured')}</Notice> : null}

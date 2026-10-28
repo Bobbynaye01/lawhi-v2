@@ -1,140 +1,151 @@
-import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import type { Riwaya } from '@lawhi/shared';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { AppText, Button, Card, Screen } from '../../components/ui';
-import { radius, spacing } from '../../constants/theme';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  AdhkarTile,
+  HomeHeader,
+  PrayerHero,
+  PrayerHeroEmpty,
+  QiblaTile,
+  QuranContinueCard,
+  ShortcutCard,
+  VerseOfDay,
+} from '../../components/home/HomeSections';
+import { TAB_BAR_SPACE } from '../../components/navigation/LawhiTabBar';
+import { Reveal } from '../../components/ui/Reveal';
+import { SectionHeader } from '../../components/ui';
+import { spacing } from '../../constants/theme';
 import { usePrayerDays } from '../../hooks/usePrayerDays';
 import { useTheme } from '../../hooks/useTheme';
-import type { RootStackParamList, TabScreenProps } from '../../navigation/types';
+import type { TabScreenProps } from '../../navigation/types';
+import { contentRepository } from '../../repositories/contentRepository';
 import { quranRepository } from '../../repositories/quranRepository';
+import { useAdhkarStore } from '../../stores/adhkarStore';
+import { useIntroStore } from '../../stores/introStore';
 import { useLocationStore } from '../../stores/locationStore';
 import { useQuranStore } from '../../stores/quranStore';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { formatTime, localized, useLocale } from '../../utils/localize';
+import { adhkarMoment } from '../../utils/adhkarMoment';
+import { localized, useLocale } from '../../utils/localize';
 
-type IconName = ComponentProps<typeof Ionicons>['name'];
-
-const shortcuts: {
-  key: string;
-  icon: IconName;
-  tab?: 'Quran' | 'Prayer' | 'Qibla' | 'Adhkar';
-  route?: keyof RootStackParamList;
-}[] = [
-  { key: 'quran', icon: 'book-outline', tab: 'Quran' },
-  { key: 'prayer', icon: 'time-outline', tab: 'Prayer' },
-  { key: 'qibla', icon: 'compass-outline', tab: 'Qibla' },
-  { key: 'adhkar', icon: 'sparkles-outline', tab: 'Adhkar' },
-  { key: 'library', icon: 'library-outline', route: 'Library' },
-  { key: 'donations', icon: 'heart-outline', route: 'Donations' },
-];
+/** Deterministic verse for the day, among short verses of the current riwaya. */
+function verseOfDay(riwaya: Riwaya, now: Date) {
+  const candidates = quranRepository.allVerses(riwaya).filter((v) => v.text.length >= 28 && v.text.length <= 95);
+  const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86_400_000);
+  return candidates[(dayNumber * 7919) % candidates.length]!;
+}
 
 export function HomeScreen({ navigation }: TabScreenProps<'Home'>) {
   const { t } = useTranslation();
   const theme = useTheme();
   const locale = useLocale();
+  const insets = useSafeAreaInsets();
+  const introDone = useIntroStore((s) => s.done);
   const place = useLocationStore((s) => s.place);
   const riwaya = useSettingsStore((s) => s.riwaya);
   const lastRead = useQuranStore((s) => s.lastRead[riwaya]);
-  const { next, now } = usePrayerDays();
+  const counts = useAdhkarStore((s) => s.counts);
+  const { days, next, now } = usePrayerDays();
 
-  const minutesLeft = next
-    ? Math.max(0, Math.round((next.at.getTime() - now.getTime()) / 60000))
-    : 0;
+  const moment = adhkarMoment(days, now);
+  const category = contentRepository.category(moment);
+  const done = category ? category.items.filter((d) => (counts[d.id] ?? 0) >= d.repetitions).length : 0;
+  const dayKey = now.toDateString();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const verse = useMemo(() => verseOfDay(riwaya, now), [riwaya, dayKey]);
+  const today = days?.[0];
 
   return (
-    <Screen edges={[]}>
-      <Card style={{ backgroundColor: theme.primary, borderColor: theme.primary }}>
-        <AppText variant="small" style={{ color: theme.onPrimary, opacity: 0.85 }}>
-          {t('home.nextPrayer')}
-        </AppText>
-        {place && next ? (
-          <>
-            <AppText variant="title" style={{ color: theme.onPrimary }}>
-              {t(`prayer.names.${next.prayer}`)} · {formatTime(next.at, locale)}
-            </AppText>
-            <AppText style={{ color: theme.onPrimary, opacity: 0.9 }}>
-              {t('home.inDuration', {
-                hours: Math.floor(minutesLeft / 60),
-                minutes: minutesLeft % 60,
-              })}{' '}
-              · {place.name}
-            </AppText>
-          </>
-        ) : (
-          <>
-            <AppText style={{ color: theme.onPrimary }}>{t('home.setLocation')}</AppText>
-            <Button
-              title={t('prayer.chooseLocation')}
-              variant="secondary"
-              onPress={() => navigation.navigate('Prayer')}
-              style={{ backgroundColor: theme.onPrimary, borderColor: theme.onPrimary }}
-            />
-          </>
-        )}
-      </Card>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: TAB_BAR_SPACE + insets.bottom }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Reveal active={introDone}>
+          <HomeHeader now={now} onSettings={() => navigation.navigate('Settings')} />
+        </Reveal>
 
-      {lastRead ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() =>
-            navigation.navigate('QuranReader', {
-              kind: 'surah',
-              number: lastRead.surah,
-              verse: lastRead.verse,
-            })
-          }
-        >
-          <Card>
-            <AppText variant="small">{t('quran.continueReading')}</AppText>
-            <AppText variant="heading">
-              {localized(quranRepository.surah(lastRead.surah)!, 'name', locale)} ·{' '}
-              {t('quran.verseNumber', { number: lastRead.verse })}
-            </AppText>
-            <AppText variant="small">{t(`quran.riwaya.${riwaya}`)}</AppText>
-          </Card>
-        </Pressable>
-      ) : null}
+        <Reveal active={introDone} delay={90}>
+          {place && today ? (
+            <PrayerHero day={today} next={next} now={now} placeName={place.name} onPress={() => navigation.navigate('Prayer')} />
+          ) : (
+            <PrayerHeroEmpty onPress={() => navigation.navigate('Prayer')} />
+          )}
+        </Reveal>
 
-      <View style={styles.grid}>
-        {shortcuts.map((s) => (
-          <Pressable
-            key={s.key}
-            accessibilityRole="button"
-            accessibilityLabel={t(`home.shortcuts.${s.key}`)}
+        <Reveal active={introDone} delay={180}>
+          <VerseOfDay
+            verse={verse}
+            surah={quranRepository.surah(verse.surah)!}
+            onPress={() => navigation.navigate('QuranReader', { kind: 'surah', number: verse.surah, verse: verse.verse })}
+          />
+        </Reveal>
+
+        <Reveal active={introDone} delay={225}>
+          <SectionHeader title={t('home.quranSection')} action={t('home.allSurahs')} onAction={() => navigation.navigate('Quran')} />
+          <QuranContinueCard
+            riwaya={riwaya}
+            lastRead={lastRead}
             onPress={() =>
-              s.tab ? navigation.navigate(s.tab) : s.route && navigation.navigate(s.route as never)
+              navigation.navigate('QuranReader', {
+                kind: 'surah',
+                number: lastRead?.surah ?? 1,
+                verse: lastRead?.verse,
+              })
             }
-            style={({ pressed }) => [
-              styles.tile,
-              {
-                backgroundColor: theme.surface,
-                borderColor: theme.border,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-          >
-            <Ionicons name={s.icon} size={30} color={theme.primary} />
-            <AppText style={{ marginTop: spacing.sm, textAlign: 'center' }}>
-              {t(`home.shortcuts.${s.key}`)}
-            </AppText>
-          </Pressable>
-        ))}
-      </View>
-    </Screen>
+          />
+        </Reveal>
+
+        <Reveal active={introDone} delay={270} style={styles.cards}>
+          <ShortcutCard
+            icon="book"
+            title={t('home.shortcuts.quran')}
+            subtitle={t('home.quranHint', { count: 114 })}
+            onPress={() => navigation.navigate('Quran')}
+          />
+          <ShortcutCard
+            icon="library"
+            title={t('home.shortcuts.library')}
+            subtitle={t('home.libraryHint', { count: contentRepository.books().length })}
+            onPress={() => navigation.navigate('Library')}
+          />
+        </Reveal>
+
+        <Reveal active={introDone} delay={315} style={styles.tiles}>
+          <QiblaTile place={place} onPress={() => navigation.navigate('Qibla')} />
+          {category ? (
+            <AdhkarTile
+              title={localized(category, 'title', locale)}
+              done={done}
+              total={category.items.length}
+              onPress={() => navigation.navigate('AdhkarCategory', { id: category.id })}
+            />
+          ) : null}
+        </Reveal>
+
+        <Reveal active={introDone} delay={360} style={styles.cards}>
+          <ShortcutCard
+            icon="adhkar"
+            title={t('home.shortcuts.adhkar')}
+            subtitle={t('home.adhkarHint')}
+            onPress={() => navigation.navigate('Adhkar')}
+          />
+          <ShortcutCard
+            icon="donate"
+            title={t('home.shortcuts.donations')}
+            subtitle={t('home.donationsHint')}
+            onPress={() => navigation.navigate('Donations')}
+          />
+        </Reveal>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  tile: {
-    flexBasis: '30%',
-    flexGrow: 1,
-    minHeight: 104,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.md,
-  },
+  content: { paddingHorizontal: spacing.lg, gap: spacing.lg },
+  cards: { gap: spacing.md },
+  tiles: { flexDirection: 'row', gap: spacing.md },
 });

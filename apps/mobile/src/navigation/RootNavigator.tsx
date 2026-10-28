@@ -1,22 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   createNavigationContainerRef,
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  useNavigation,
   type Theme,
 } from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  type NativeStackNavigationProp,
-} from '@react-navigation/native-stack';
-import type { ComponentProps } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import { Pressable } from 'react-native';
-import { MIN_TOUCH } from '../constants/theme';
+import { LawhiTabBar } from '../components/navigation/LawhiTabBar';
+import { fonts } from '../constants/theme';
 import { useIsDark, useTheme } from '../hooks/useTheme';
+import { useIsArabicUi } from '../hooks/useTypography';
 import { AccountScreen } from '../screens/account/AccountScreen';
 import {
   ForgotPasswordScreen,
@@ -29,7 +24,9 @@ import { AdhkarHomeScreen } from '../screens/adhkar/AdhkarHomeScreen';
 import { TasbihScreen } from '../screens/adhkar/TasbihScreen';
 import { DonationDetailScreen } from '../screens/donations/DonationDetailScreen';
 import { DonationFormScreen } from '../screens/donations/DonationFormScreen';
+import { CauseEditorScreen } from '../screens/donations/CauseEditorScreen';
 import { DonationsScreen } from '../screens/donations/DonationsScreen';
+import { SadaqaAdminScreen } from '../screens/donations/SadaqaAdminScreen';
 import { MyDonationsScreen } from '../screens/donations/MyDonationsScreen';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { BookChapterScreen } from '../screens/library/BookChapterScreen';
@@ -52,65 +49,33 @@ export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-type IconName = ComponentProps<typeof Ionicons>['name'];
-const TAB_ICONS: Record<keyof TabParamList, [IconName, IconName]> = {
-  Home: ['home', 'home-outline'],
-  Quran: ['book', 'book-outline'],
-  Prayer: ['time', 'time-outline'],
-  Qibla: ['compass', 'compass-outline'],
-  Adhkar: ['sparkles', 'sparkles-outline'],
-};
-
-function SettingsButton() {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={t('settings.title')}
-      onPress={() => navigation.navigate('Settings')}
-      style={{
-        minWidth: MIN_TOUCH,
-        minHeight: MIN_TOUCH,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Ionicons name="settings-outline" size={22} color={theme.text} />
-    </Pressable>
-  );
-}
-
 function Tabs() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const arabic = useIsArabicUi();
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: theme.textMuted,
-        tabBarStyle: { backgroundColor: theme.surface, borderTopColor: theme.border },
-        headerStyle: { backgroundColor: theme.surface },
-        headerTintColor: theme.text,
-        tabBarIcon: ({ focused, color, size }) => (
-          <Ionicons name={TAB_ICONS[route.name][focused ? 0 : 1]} size={size} color={color} />
-        ),
-        headerRight: route.name === 'Home' ? () => <SettingsButton /> : undefined,
-      })}
+      tabBar={(props) => <LawhiTabBar {...props} />}
+      screenOptions={{ headerShown: false, animation: 'fade' }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ title: t('app.name'), tabBarLabel: t('tabs.home') }}
-      />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tabs.home') }} />
       <Tab.Screen name="Quran" component={QuranHomeScreen} options={{ title: t('tabs.quran') }} />
       <Tab.Screen name="Prayer" component={PrayerScreen} options={{ title: t('tabs.prayer') }} />
       <Tab.Screen name="Qibla" component={QiblaScreen} options={{ title: t('tabs.qibla') }} />
       <Tab.Screen
-        name="Adhkar"
-        component={AdhkarHomeScreen}
-        options={{ title: t('tabs.adhkar') }}
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          title: t('settings.title'),
+          headerShown: true,
+          headerStyle: { backgroundColor: theme.background },
+          headerShadowVisible: false,
+          headerTintColor: theme.textPrimary,
+          headerTitleStyle: {
+            fontFamily: arabic ? fonts.arabicSemiBold : fonts.displayMedium,
+            fontSize: 19,
+          },
+        }}
       />
     </Tab.Navigator>
   );
@@ -118,6 +83,7 @@ function Tabs() {
 
 export function RootNavigator({ onReady }: { onReady?: () => void }) {
   const { t } = useTranslation();
+  const arabic = useIsArabicUi();
   const theme = useTheme();
   const isDark = useIsDark();
   const base = isDark ? DarkTheme : DefaultTheme;
@@ -128,7 +94,7 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
       primary: theme.primary,
       background: theme.background,
       card: theme.surface,
-      text: theme.text,
+      text: theme.textPrimary,
       border: theme.border,
     },
   };
@@ -142,9 +108,16 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
     >
       <Stack.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: theme.surface },
-          headerTintColor: theme.text,
+          headerStyle: { backgroundColor: theme.background },
+          headerShadowVisible: false,
+          headerTintColor: theme.textPrimary,
+          headerTitleStyle: {
+            fontFamily: arabic ? fonts.arabicSemiBold : fonts.displayMedium,
+            fontSize: 19,
+          },
+          headerBackButtonDisplayMode: 'minimal',
           contentStyle: { backgroundColor: theme.background },
+          animation: 'fade_from_bottom',
         }}
       >
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
@@ -158,6 +131,11 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
           name="Bookmarks"
           component={BookmarksScreen}
           options={{ title: t('quran.bookmarks') }}
+        />
+        <Stack.Screen
+          name="Adhkar"
+          component={AdhkarHomeScreen}
+          options={{ title: t('tabs.adhkar') }}
         />
         <Stack.Screen
           name="AdhkarCategory"
@@ -198,10 +176,11 @@ export function RootNavigator({ onReady }: { onReady?: () => void }) {
           options={{ title: t('donations.myDonations') }}
         />
         <Stack.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{ title: t('settings.title') }}
+          name="SadaqaAdmin"
+          component={SadaqaAdminScreen}
+          options={{ title: t('donations.admin.title') }}
         />
+        <Stack.Screen name="CauseEditor" component={CauseEditorScreen} options={{ title: '' }} />
         <Stack.Screen
           name="CityPicker"
           component={CityPickerScreen}

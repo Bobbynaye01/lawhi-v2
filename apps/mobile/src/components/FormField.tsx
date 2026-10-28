@@ -19,11 +19,11 @@ export function FormField({
         {...input}
         accessibilityLabel={label}
         accessibilityLabelledBy={`label-${label}`}
-        placeholderTextColor={theme.textMuted}
+        placeholderTextColor={theme.muted}
         style={[
           styles.input,
           {
-            color: theme.text,
+            color: theme.textPrimary,
             backgroundColor: theme.surface,
             borderColor: error ? theme.danger : theme.border,
           },

@@ -33,12 +33,12 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
           value={query}
           onChangeText={setQuery}
           placeholder={t('quran.searchPlaceholder')}
-          placeholderTextColor={theme.textMuted}
+          placeholderTextColor={theme.muted}
           accessibilityLabel={t('quran.search')}
           autoFocus
           style={[
             styles.input,
-            { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface },
+            { color: theme.textPrimary, borderColor: theme.border, backgroundColor: theme.surface },
           ]}
         />
         <AppText variant="small">{t(`quran.riwaya.${riwaya}`)}</AppText>
@@ -82,7 +82,7 @@ export function QuranSearchScreen({ navigation }: RootScreenProps<'QuranSearch'>
                 })
               }
               trailing={
-                <AppText numberOfLines={2} style={[styles.arabic, { color: theme.quranText }]}>
+                <AppText numberOfLines={2} style={[styles.arabic, { color: theme.ink }]}>
                   {item.text}
                 </AppText>
               }
@@ -103,5 +103,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     fontSize: 18,
   },
-  arabic: { fontFamily: fonts.arabic, fontSize: 18, maxWidth: '62%', textAlign: 'right' },
+  arabic: { fontFamily: fonts.quran, fontSize: 18, maxWidth: '62%', textAlign: 'right' },
 });

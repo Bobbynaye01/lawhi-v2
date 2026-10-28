@@ -118,7 +118,7 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
               },
             ]}
           >
-            <AppText style={{ color: m.id === methodId ? theme.onPrimary : theme.text }}>
+            <AppText style={{ color: m.id === methodId ? theme.onPrimary : theme.textPrimary }}>
               {m.name}
             </AppText>
           </Pressable>
@@ -160,7 +160,7 @@ export function DonationFormScreen({ route, navigation }: RootScreenProps<'Donat
               styles.chip,
               {
                 borderColor: amount === p ? theme.primary : theme.border,
-                backgroundColor: amount === p ? theme.card : theme.surface,
+                backgroundColor: amount === p ? theme.surfaceSunken : theme.surface,
               },
             ]}
           >

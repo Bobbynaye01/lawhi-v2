@@ -21,7 +21,6 @@
   },
   "home": {
     "nextPrayer": "Prochaine prière",
-    "inDuration": "dans {{hours}} h {{minutes}} min",
     "setLocation": "Choisissez votre ville pour afficher les horaires de prière.",
     "shortcuts": {
       "quran": "Coran",
@@ -29,8 +28,26 @@
       "qibla": "Qibla",
       "adhkar": "Adhkar",
       "library": "Bibliothèque",
-      "donations": "Dons"
-    }
+      "donations": "Sadgue (Dons)"
+    },
+    "greeting": "As-salāmu ʿalaykum",
+    "setLocationTitle": "Où priez-vous ?",
+    "inHoursMinutes": "dans {{hours}} h {{minutes}}",
+    "inMinutes": "dans {{minutes}} min",
+    "quranSection": "Votre lawh",
+    "allSurahs": "Toutes les sourates",
+    "startReading": "Commencer la lecture",
+    "resume": "Reprendre",
+    "open": "Ouvrir",
+    "qiblaBearing": "{{degrees}}° depuis le nord",
+    "qiblaNoPlace": "Position requise",
+    "now": "En ce moment",
+    "adhkarProgress": "{{done}} sur {{total}} aujourd’hui",
+    "verseOfDay": "Verset du jour",
+    "quranHint": "{{count}} sourates, lecture et récitation",
+    "libraryHint": "{{count}} livres, extraits lisibles hors ligne",
+    "adhkarHint": "Matin, soir, invocations et tasbih",
+    "donationsHint": "Soutenir un projet, en MRU"
   },
   "quran": {
     "search": "Rechercher dans le Coran",
@@ -62,6 +79,8 @@
     "removeBookmark": "Retirer des favoris",
     "verseA11y": "Sourate {{surah}}, verset {{verse}}",
     "verseHint": "Ouvre les actions du verset",
+    "previousSurah": "Sourate précédente",
+    "nextSurah": "Sourate suivante",
     "noResults": "Aucun verset trouvé.",
     "resultsCount": "{{count}} résultat(s)",
     "resultsLimited": "{{count}} premiers résultats — précisez la recherche",
@@ -79,7 +98,8 @@
       "networkError": "Audio indisponible : vérifiez votre connexion.",
       "playbackError": "Impossible de lire ce verset.",
       "noReciterForRiwaya": "Aucune récitation Warsh vérifiée n’est disponible pour le moment. Le texte Warsh reste consultable."
-    }
+    },
+    "overline": "Le Noble Coran"
   },
   "prayer": {
     "names": {
@@ -130,7 +150,12 @@
     "notificationsWebUnsupported": "Les notifications de prière sont disponibles dans l’application Android et iOS.",
     "cityPlaceholder": "Nom de la ville (ex. Nouakchott)",
     "citySearchOffline": "La recherche de ville nécessite Internet. Hors ligne, utilisez le GPS.",
-    "noCityFound": "Aucune ville trouvée."
+    "noCityFound": "Aucune ville trouvée.",
+    "title": "Horaires de prière",
+    "today": "Aujourd’hui",
+    "tomorrow": "demain",
+    "calculation": "Calcul",
+    "sunriseHint": "fin du temps de Fajr"
   },
   "qibla": {
     "needLocationTitle": "Position nécessaire",
@@ -144,7 +169,17 @@
     "permissionDenied": "La boussole a besoin de l’autorisation de localisation.",
     "noSensor": "Aucun capteur de boussole n’est disponible sur cet appareil. Utilisez la direction : {{degrees}}° depuis le nord (avec une boussole classique).",
     "turnRight": "Tournez de {{degrees}}° vers la droite",
-    "turnLeft": "Tournez de {{degrees}}° vers la gauche"
+    "turnLeft": "Tournez de {{degrees}}° vers la gauche",
+    "direction": "Direction",
+    "distanceShort": "Distance",
+    "fromNorth": "depuis le nord",
+    "staticHint": "Sans boussole : tenez le téléphone à plat, le haut de l’écran vers le nord.",
+    "cardinals": {
+      "n": "N",
+      "e": "E",
+      "s": "S",
+      "w": "O"
+    }
   },
   "adhkar": {
     "adhkar": "Adhkar",
@@ -164,7 +199,13 @@
     "tasbih": "Tasbih",
     "tasbihHint": "Compteur libre",
     "tapToCount": "Touchez pour compter",
-    "tasbihA11y": "Tasbih : {{count}}. Touchez pour compter."
+    "tasbihA11y": "Tasbih : {{count}}. Touchez pour compter.",
+    "overline": "Le rappel d’Allah",
+    "start": "Commencer",
+    "continue": "Continuer",
+    "completed": "Terminé",
+    "cycle": "Tour {{n}} · 33 par tour",
+    "clearSearch": "Effacer la recherche"
   },
   "library": {
     "title": "Bibliothèque",
@@ -193,10 +234,21 @@
     "cannotOpen": "Impossible d’ouvrir ce PDF",
     "cannotOpenHint": "Supprimez-le puis téléchargez-le à nouveau.",
     "webPdfTitle": "Le PDF s’ouvre dans le lecteur de votre navigateur.",
-    "nativeReaderUnavailable": "Le lecteur PDF intégré n'est pas disponible dans Expo Go : le livre s'ouvre dans le lecteur du téléphone."
+    "nativeReaderUnavailable": "Le lecteur PDF intégré n'est pas disponible dans Expo Go : le livre s'ouvre dans le lecteur du téléphone.",
+    "overline": "Hadith et adhkar",
+    "search": "Rechercher dans la bibliothèque",
+    "searchPlaceholder": "Titre, chapitre ou texte arabe",
+    "recent": "Reprendre",
+    "all": "Tous",
+    "hadith": "Hadith",
+    "adhkarBooks": "Adhkar",
+    "noResults": "Aucun résultat.",
+    "atPage": "Page {{page}}",
+    "pdfOnly": "PDF",
+    "offline": "Hors ligne"
   },
   "donations": {
-    "title": "Dons",
+    "title": "Sadgue (Dons)",
     "featured": "Projet prioritaire",
     "howItWorks": "Les dons se font par transfert mobile (Bankily, Masrivi…). Après le transfert, ajoutez la référence ou une capture : un administrateur vérifie puis confirme votre don.",
     "collected": "Dons confirmés : {{collected}}",
@@ -263,6 +315,63 @@
       "donorName": "Nom trop court ou trop long.",
       "donorPhone": "Numéro mauritanien invalide (8 chiffres commençant par 2, 3 ou 4).",
       "reference": "Référence invalide (3 à 64 caractères)."
+    },
+    "balanceLabel": "Total des dons",
+    "updatedOn": "Mis à jour le {{date}}",
+    "notUpdatedYet": "Pas encore mis à jour",
+    "balanceA11y": "Total des dons : {{amount}}. {{updated}}",
+    "giveTitle": "Faire un don",
+    "giveViaBankily": "Envoyez votre don via Bankily à ce numéro",
+    "copy": "Copier",
+    "numberCopied": "Numéro copié ✓",
+    "copyNumberA11y": "Copier le numéro Bankily {{number}}",
+    "noBankily": "Le numéro Bankily s’affichera ici dès qu’il aura été configuré.",
+    "projects": "Projets et événements",
+    "causeStatus": {
+      "upcoming": "À venir",
+      "ongoing": "En cours",
+      "completed": "Réalisé"
+    },
+    "goalProgress": "{{collected}} collectés sur {{goal}}",
+    "admin": {
+      "manage": "Gérer",
+      "title": "Gestion Sadgue",
+      "summaryTitle": "Solde et Bankily",
+      "totalLabel": "Montant total actuel (MRU)",
+      "saveTotal": "Mettre à jour le total",
+      "bankilyLabel": "Numéro Bankily",
+      "saveNumber": "Enregistrer le numéro",
+      "saved": "Enregistré ✓",
+      "projects": "Projets",
+      "newProject": "Nouveau projet",
+      "editProject": "Modifier le projet",
+      "titleFr": "Titre (français)",
+      "titleAr": "Titre (arabe)",
+      "titleEn": "Titre (anglais)",
+      "descriptionFr": "Description (français)",
+      "descriptionAr": "Description (arabe)",
+      "descriptionEn": "Description (anglais)",
+      "status": "Statut",
+      "eventDate": "Date (facultative)",
+      "eventDateHint": "Format AAAA-MM-JJ, ex. 2026-12-20",
+      "goal": "Objectif en MRU (facultatif)",
+      "collected": "Déjà collecté (MRU)",
+      "visible": "Visible dans l’app",
+      "featured": "Mis en avant",
+      "save": "Enregistrer",
+      "create": "Créer le projet",
+      "delete": "Supprimer le projet",
+      "deleteTitle": "Supprimer ce projet ?",
+      "deleteMessage": "Cette action est définitive.",
+      "archived": "Ce projet a déjà des dons enregistrés : il a été masqué plutôt que supprimé.",
+      "image": "Image",
+      "addImage": "Choisir une image",
+      "changeImage": "Changer l’image",
+      "removeImage": "Retirer l’image",
+      "imageHint": "JPG, PNG ou WebP, 2 Mo maximum. L’image s’ajoute après la création du projet.",
+      "textsRequired": "Titres et descriptions requis dans les trois langues (2 caractères minimum).",
+      "invalidDate": "Date invalide (format AAAA-MM-JJ).",
+      "hidden": "Masqué"
     }
   },
   "settings": {
@@ -360,6 +469,16 @@
     "proof_type_not_allowed": "Format non accepté : JPG, PNG, WebP ou PDF uniquement.",
     "proof_storage_unavailable": "L’envoi de preuves est momentanément indisponible.",
     "geocoding_unavailable": "La recherche de ville est momentanément indisponible.",
-    "internal_error": "Erreur du serveur. Réessayez plus tard."
+    "internal_error": "Erreur du serveur. Réessayez plus tard.",
+    "cause_not_found": "Ce projet n’existe plus.",
+    "cause_slug_taken": "Un projet porte déjà ce nom. Modifiez le titre français.",
+    "image_too_large": "Image trop lourde (2 Mo maximum).",
+    "image_type_not_allowed": "Format non accepté : JPG, PNG ou WebP uniquement.",
+    "image_missing": "Choisissez une image.",
+    "image_storage_unavailable": "Le stockage des images n’est pas disponible pour le moment.",
+    "image_not_found": "Image introuvable."
+  },
+  "intro": {
+    "skip": "Touchez pour passer"
   }
 }

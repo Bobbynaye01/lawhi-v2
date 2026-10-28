@@ -8,7 +8,7 @@ export type TabParamList = {
   Quran: undefined;
   Prayer: undefined;
   Qibla: undefined;
-  Adhkar: undefined;
+  Settings: undefined;
 };
 
 export type ReaderTarget =
@@ -19,6 +19,7 @@ export type RootStackParamList = {
   QuranReader: ReaderTarget;
   QuranSearch: undefined;
   Bookmarks: undefined;
+  Adhkar: undefined;
   AdhkarCategory: { id: string };
   Tasbih: undefined;
   Library: undefined;
@@ -29,7 +30,8 @@ export type RootStackParamList = {
   DonationForm: { causeId: string };
   DonationDetail: { donationId: string };
   MyDonations: undefined;
-  Settings: undefined;
+  SadaqaAdmin: undefined;
+  CauseEditor: { causeId?: string };
   CityPicker: undefined;
   Account: undefined;
   SignIn: { redirect?: 'Donations' | 'MyDonations' } | undefined;

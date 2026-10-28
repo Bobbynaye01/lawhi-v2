@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { I18nextProvider } from 'react-i18next';
+import * as Clipboard from 'expo-clipboard';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { i18n, initI18n } from '../i18n';
 import { api } from '../services/api/endpoints';
@@ -9,6 +10,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { RootNavigator } from './RootNavigator';
 
 jest.mock('react-native-pdf', () => 'Pdf');
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn().mockResolvedValue(true) }));
 jest.mock('../services/prayerNotifications', () => ({
   syncPrayerNotifications: jest.fn().mockResolvedValue('scheduled'),
   effectiveMode: (m: string) => m,
@@ -46,7 +48,7 @@ describe('navigation', () => {
   it('opens on Home with every shortcut', async () => {
     await renderApp();
     expect(await screen.findByText('Prochaine prière')).toBeTruthy();
-    for (const label of ['Bibliothèque', 'Dons', 'Horaires']) {
+    for (const label of ['Bibliothèque', 'Sadgue (Dons)', 'Qibla', 'Adhkar']) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     }
   });
@@ -61,15 +63,16 @@ describe('navigation', () => {
     });
     await renderApp();
     fireEvent.press(screen.getAllByText('Prière')[0]!);
-    expect(await screen.findByText('Fajr')).toBeTruthy();
-    expect(screen.getByText('Maghrib')).toBeTruthy();
+    expect((await screen.findAllByText('Fajr')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Maghrib').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Nouakchott').length).toBeGreaterThan(0);
   });
 
   it('lists surahs and opens the reader with the verified text', async () => {
     await renderApp();
     fireEvent.press(screen.getAllByText('Coran')[0]!);
-    fireEvent.press(await screen.findByText(/Al-Fatihah/));
+    // The Home card also names Al-Fatihah: press the surah row of the Quran list.
+    fireEvent.press(await screen.findByLabelText("1. L'ouverture"));
     expect(await screen.findByText(/الْحَمْدُ|ٱلْحَمْدُ/)).toBeTruthy();
   });
 
@@ -82,26 +85,65 @@ describe('navigation', () => {
 });
 
 describe('donations screen', () => {
-  it('explains honestly when no payment method is configured', async () => {
-    jest.spyOn(api, 'causes').mockResolvedValue([
-      {
-        id: 'c1',
-        slug: 'mosque',
-        titleAr: 'مشروع بناء المسجد',
-        titleFr: 'Construction d’une mosquée',
-        titleEn: 'Mosque construction',
-        descriptionAr: '',
-        descriptionFr: 'Nouakchott',
-        descriptionEn: '',
-        goalAmount: null,
-        featured: true,
-        confirmedAmount: 1500,
-        confirmedCount: 2,
-      },
-    ]);
+  const cause = {
+    id: 'c1',
+    slug: 'mosque',
+    titleAr: 'مشروع بناء المسجد',
+    titleFr: 'Construction d’une mosquée',
+    titleEn: 'Mosque construction',
+    descriptionAr: '',
+    descriptionFr: 'Nouakchott',
+    descriptionEn: '',
+    goalAmount: 50000,
+    collectedAmount: 12000,
+    status: 'ongoing' as const,
+    eventDate: null,
+    imageUrl: null,
+    featured: true,
+    active: true,
+    sortOrder: 0,
+  };
+
+  it('shows the shared balance, the Bankily number to copy, and the projects', async () => {
+    jest.spyOn(api, 'donationSummary').mockResolvedValue({
+      totalAmount: 125000,
+      currency: 'MRU',
+      updatedAt: '2026-10-02T10:00:00.000Z',
+      bankilyPhone: '22334455',
+    });
+    jest.spyOn(api, 'causes').mockResolvedValue([cause]);
     await renderApp();
-    fireEvent.press(await screen.findByText('Dons'));
-    expect(await screen.findByText('Construction d’une mosquée')).toBeTruthy();
-    expect(screen.getByText('Dons confirmés : 1 500 MRU')).toBeTruthy();
+    fireEvent.press(await screen.findByText('Sadgue (Dons)'));
+
+    expect(await screen.findByText('125 000')).toBeTruthy();
+    expect(screen.getByText('Mis à jour le 02/10/2026')).toBeTruthy();
+    expect(screen.getByText('22 33 44 55')).toBeTruthy();
+    fireEvent.press(screen.getByText('Copier'));
+    expect(await screen.findByText('Numéro copié ✓')).toBeTruthy();
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith('22334455');
+
+    expect(screen.getByText('Construction d’une mosquée')).toBeTruthy();
+    expect(screen.getByText('En cours')).toBeTruthy();
+    expect(screen.getByText('12 000 MRU collectés sur 50 000 MRU')).toBeTruthy();
+    // Bankily only: the block title is the sole "Faire un don" — no per-project form button.
+    expect(screen.getAllByText('Faire un don')).toHaveLength(1);
+    expect(screen.queryByText('Mes dons')).toBeNull();
+  });
+
+  it('says so until an admin has set the Bankily number', async () => {
+    jest.spyOn(api, 'donationSummary').mockResolvedValue({
+      totalAmount: 0,
+      currency: 'MRU',
+      updatedAt: null,
+      bankilyPhone: null,
+    });
+    jest.spyOn(api, 'causes').mockResolvedValue([]);
+    await renderApp();
+    fireEvent.press(await screen.findByText('Sadgue (Dons)'));
+    expect(
+      await screen.findByText('Le numéro Bankily s’affichera ici dès qu’il aura été configuré.'),
+    ).toBeTruthy();
+    expect(screen.getByText('Pas encore mis à jour')).toBeTruthy();
+    expect(screen.queryByText('Copier')).toBeNull();
   });
 });

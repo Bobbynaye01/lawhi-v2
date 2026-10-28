@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, isLocale, isRtl, type Locale } from '@lawhi/shared';
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@lawhi/shared';
 import { getLocales } from 'expo-localization';
 import * as Updates from 'expo-updates';
 import { createInstance } from 'i18next';
@@ -31,35 +31,40 @@ export function initI18n(locale: Locale) {
       returnNull: false,
     });
   }
-  applyDirection(locale);
+  // A layout mirrored by an earlier version is undone once, at startup.
+  if (applyDirection(locale)) void reload();
   return i18n;
 }
 
 /**
- * On native, the layout direction is fixed at startup: switching between an
- * RTL and an LTR language requires a reload. Returns true if a reload is needed.
+ * The interface keeps the same layout in every language: in Arabic only the
+ * text is right-to-left (each string still flows right-to-left on its own),
+ * buttons, rows and navigation do not mirror.
+ * On native the layout direction is fixed at startup, so leaving a previously
+ * mirrored layout requires a reload. Returns true if a reload is needed.
  */
 export function applyDirection(locale: Locale): boolean {
-  const rtl = isRtl(locale);
   if (Platform.OS === 'web') {
     if (typeof document !== 'undefined') {
-      document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+      document.documentElement.dir = 'ltr';
       document.documentElement.lang = locale;
     }
     return false;
   }
-  I18nManager.allowRTL(true);
-  if (I18nManager.isRTL === rtl) return false;
-  I18nManager.forceRTL(rtl);
+  I18nManager.allowRTL(false);
+  if (!I18nManager.isRTL) return false;
+  I18nManager.forceRTL(false);
   return true;
+}
+
+async function reload() {
+  if (__DEV__) DevSettings.reload();
+  else await Updates.reloadAsync();
 }
 
 export async function changeLanguage(locale: Locale) {
   await i18n.changeLanguage(locale);
-  if (applyDirection(locale)) {
-    if (__DEV__) DevSettings.reload();
-    else await Updates.reloadAsync();
-  }
+  if (applyDirection(locale)) await reload();
 }
 
 export { i18n };

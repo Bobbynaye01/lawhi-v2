@@ -21,7 +21,6 @@
   },
   "home": {
     "nextPrayer": "الصلاة القادمة",
-    "inDuration": "بعد {{hours}} س {{minutes}} د",
     "setLocation": "اختر مدينتك لعرض أوقات الصلاة.",
     "shortcuts": {
       "quran": "القرآن",
@@ -29,8 +28,26 @@
       "qibla": "القبلة",
       "adhkar": "الأذكار",
       "library": "المكتبة",
-      "donations": "التبرعات"
-    }
+      "donations": "الصدقة (التبرعات)"
+    },
+    "greeting": "السلام عليكم",
+    "setLocationTitle": "أين تصلّي؟",
+    "inHoursMinutes": "بعد {{hours}} س {{minutes}} د",
+    "inMinutes": "بعد {{minutes}} دقيقة",
+    "quranSection": "لوحك",
+    "allSurahs": "كل السور",
+    "startReading": "ابدأ القراءة",
+    "resume": "متابعة",
+    "open": "فتح",
+    "qiblaBearing": "{{degrees}}° من الشمال",
+    "qiblaNoPlace": "الموقع مطلوب",
+    "now": "الآن",
+    "adhkarProgress": "{{done}} من {{total}} اليوم",
+    "verseOfDay": "آية اليوم",
+    "quranHint": "{{count}} سورة، قراءة واستماع",
+    "libraryHint": "{{count}} كتب، مقتطفات تُقرأ دون اتصال",
+    "adhkarHint": "أذكار الصباح والمساء والأدعية والتسبيح",
+    "donationsHint": "ادعم مشروعًا بالأوقية"
   },
   "quran": {
     "search": "البحث في القرآن",
@@ -62,6 +79,8 @@
     "removeBookmark": "إزالة من المفضلة",
     "verseA11y": "سورة {{surah}}، الآية {{verse}}",
     "verseHint": "يفتح خيارات الآية",
+    "previousSurah": "السورة السابقة",
+    "nextSurah": "السورة التالية",
     "noResults": "لم يُعثر على أي آية.",
     "resultsCount": "عدد النتائج: {{count}}",
     "resultsLimited": "أول {{count}} نتيجة — حدّد البحث أكثر",
@@ -79,7 +98,8 @@
       "networkError": "التلاوة غير متاحة: تحقّق من الاتصال.",
       "playbackError": "تعذّر تشغيل هذه الآية.",
       "noReciterForRiwaya": "لا توجد حاليًا تلاوة موثّقة برواية ورش. يمكنك قراءة نص ورش."
-    }
+    },
+    "overline": "القرآن الكريم"
   },
   "prayer": {
     "names": {
@@ -130,7 +150,12 @@
     "notificationsWebUnsupported": "تنبيهات الصلاة متاحة في تطبيق أندرويد وآيفون.",
     "cityPlaceholder": "اسم المدينة (مثل نواكشوط)",
     "citySearchOffline": "يتطلب البحث عن المدن اتصالًا بالإنترنت. دون اتصال، استخدم GPS.",
-    "noCityFound": "لم يُعثر على أي مدينة."
+    "noCityFound": "لم يُعثر على أي مدينة.",
+    "title": "مواقيت الصلاة",
+    "today": "اليوم",
+    "tomorrow": "غدًا",
+    "calculation": "طريقة الحساب",
+    "sunriseHint": "نهاية وقت الفجر"
   },
   "qibla": {
     "needLocationTitle": "الموقع مطلوب",
@@ -144,7 +169,17 @@
     "permissionDenied": "تحتاج البوصلة إلى إذن تحديد الموقع.",
     "noSensor": "لا يتوفر في هذا الجهاز مستشعر بوصلة صالح. استخدم الاتجاه: {{degrees}}° من الشمال (ببوصلة عادية).",
     "turnRight": "استدر {{degrees}}° نحو اليمين",
-    "turnLeft": "استدر {{degrees}}° نحو اليسار"
+    "turnLeft": "استدر {{degrees}}° نحو اليسار",
+    "direction": "الاتجاه",
+    "distanceShort": "المسافة",
+    "fromNorth": "من الشمال",
+    "staticHint": "بدون بوصلة: ضع الهاتف أفقيًا ووجّه أعلى الشاشة نحو الشمال.",
+    "cardinals": {
+      "n": "ش",
+      "e": "ق",
+      "s": "ج",
+      "w": "غ"
+    }
   },
   "adhkar": {
     "adhkar": "الأذكار",
@@ -164,7 +199,13 @@
     "tasbih": "التسبيح",
     "tasbihHint": "عدّاد حر",
     "tapToCount": "المس للعدّ",
-    "tasbihA11y": "التسبيح: {{count}}. المس للعدّ."
+    "tasbihA11y": "التسبيح: {{count}}. المس للعدّ.",
+    "overline": "ذكر الله",
+    "start": "ابدأ",
+    "continue": "تابع",
+    "completed": "تمّ",
+    "cycle": "الدورة {{n}} · 33 في كل دورة",
+    "clearSearch": "مسح البحث"
   },
   "library": {
     "title": "المكتبة",
@@ -193,10 +234,21 @@
     "cannotOpen": "تعذّر فتح هذا الملف",
     "cannotOpenHint": "احذفه ثم نزّله من جديد.",
     "webPdfTitle": "يُفتح ملف PDF في عارض المتصفح.",
-    "nativeReaderUnavailable": "قارئ PDF المدمج غير متاح في Expo Go: سيُفتح الكتاب في عارض الهاتف."
+    "nativeReaderUnavailable": "قارئ PDF المدمج غير متاح في Expo Go: سيُفتح الكتاب في عارض الهاتف.",
+    "overline": "الحديث والأذكار",
+    "search": "البحث في المكتبة",
+    "searchPlaceholder": "العنوان أو الباب أو النص",
+    "recent": "متابعة القراءة",
+    "all": "الكل",
+    "hadith": "الحديث",
+    "adhkarBooks": "الأذكار",
+    "noResults": "لا توجد نتائج.",
+    "atPage": "الصفحة {{page}}",
+    "pdfOnly": "PDF",
+    "offline": "دون اتصال"
   },
   "donations": {
-    "title": "التبرعات",
+    "title": "الصدقة (التبرعات)",
     "featured": "مشروع ذو أولوية",
     "howItWorks": "يتم التبرع بالتحويل عبر الهاتف (بنكيلي، مصرفي…). بعد التحويل أضف المرجع أو صورة الإيصال، ثم يتحقق المسؤول من تبرعك ويؤكده.",
     "collected": "التبرعات المؤكدة: {{collected}}",
@@ -263,6 +315,63 @@
       "donorName": "الاسم قصير جدًا أو طويل جدًا.",
       "donorPhone": "رقم موريتاني غير صالح (8 أرقام تبدأ بـ 2 أو 3 أو 4).",
       "reference": "مرجع غير صالح (من 3 إلى 64 حرفًا)."
+    },
+    "balanceLabel": "إجمالي التبرعات",
+    "updatedOn": "آخر تحديث {{date}}",
+    "notUpdatedYet": "لم يُحدَّث بعد",
+    "balanceA11y": "إجمالي التبرعات: {{amount}}. {{updated}}",
+    "giveTitle": "تبرّع",
+    "giveViaBankily": "أرسل تبرعك عبر بنكيلي إلى هذا الرقم",
+    "copy": "نسخ",
+    "numberCopied": "تم نسخ الرقم ✓",
+    "copyNumberA11y": "نسخ رقم بنكيلي {{number}}",
+    "noBankily": "سيظهر رقم بنكيلي هنا فور إعداده.",
+    "projects": "المشاريع والفعاليات",
+    "causeStatus": {
+      "upcoming": "قادم",
+      "ongoing": "جارٍ",
+      "completed": "منجز"
+    },
+    "goalProgress": "جُمع {{collected}} من {{goal}}",
+    "admin": {
+      "manage": "إدارة",
+      "title": "إدارة الصدقة",
+      "summaryTitle": "الرصيد ورقم بنكيلي",
+      "totalLabel": "المبلغ الإجمالي الحالي (أوقية)",
+      "saveTotal": "تحديث الإجمالي",
+      "bankilyLabel": "رقم بنكيلي",
+      "saveNumber": "حفظ الرقم",
+      "saved": "تم الحفظ ✓",
+      "projects": "المشاريع",
+      "newProject": "مشروع جديد",
+      "editProject": "تعديل المشروع",
+      "titleFr": "العنوان (بالفرنسية)",
+      "titleAr": "العنوان (بالعربية)",
+      "titleEn": "العنوان (بالإنجليزية)",
+      "descriptionFr": "الوصف (بالفرنسية)",
+      "descriptionAr": "الوصف (بالعربية)",
+      "descriptionEn": "الوصف (بالإنجليزية)",
+      "status": "الحالة",
+      "eventDate": "التاريخ (اختياري)",
+      "eventDateHint": "بصيغة YYYY-MM-DD، مثال 2026-12-20",
+      "goal": "الهدف بالأوقية (اختياري)",
+      "collected": "المبلغ المجموع حتى الآن (أوقية)",
+      "visible": "ظاهر في التطبيق",
+      "featured": "مميّز",
+      "save": "حفظ",
+      "create": "إنشاء المشروع",
+      "delete": "حذف المشروع",
+      "deleteTitle": "حذف هذا المشروع؟",
+      "deleteMessage": "لا يمكن التراجع عن هذا الإجراء.",
+      "archived": "لهذا المشروع تبرعات مسجلة: تم إخفاؤه بدل حذفه.",
+      "image": "الصورة",
+      "addImage": "اختيار صورة",
+      "changeImage": "تغيير الصورة",
+      "removeImage": "إزالة الصورة",
+      "imageHint": "JPG أو PNG أو WebP، بحد أقصى 2 ميغابايت. تُضاف الصورة بعد إنشاء المشروع.",
+      "textsRequired": "العناوين والأوصاف مطلوبة باللغات الثلاث (حرفان على الأقل).",
+      "invalidDate": "تاريخ غير صالح (بصيغة YYYY-MM-DD).",
+      "hidden": "مخفي"
     }
   },
   "settings": {
@@ -360,6 +469,16 @@
     "proof_type_not_allowed": "صيغة غير مقبولة: JPG أو PNG أو WebP أو PDF فقط.",
     "proof_storage_unavailable": "إرسال الإثباتات غير متاح مؤقتًا.",
     "geocoding_unavailable": "البحث عن المدن غير متاح مؤقتًا.",
-    "internal_error": "خطأ في الخادم. حاول لاحقًا."
+    "internal_error": "خطأ في الخادم. حاول لاحقًا.",
+    "cause_not_found": "هذا المشروع لم يعد موجودًا.",
+    "cause_slug_taken": "يوجد مشروع بهذا الاسم. غيّر العنوان الفرنسي.",
+    "image_too_large": "الصورة كبيرة جدًا (2 ميغابايت كحد أقصى).",
+    "image_type_not_allowed": "صيغة غير مقبولة: JPG أو PNG أو WebP فقط.",
+    "image_missing": "اختر صورة.",
+    "image_storage_unavailable": "تخزين الصور غير متاح حاليًا.",
+    "image_not_found": "الصورة غير موجودة."
+  },
+  "intro": {
+    "skip": "المس للتخطي"
   }
 }

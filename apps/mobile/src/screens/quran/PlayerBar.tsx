@@ -1,20 +1,23 @@
-import { Ionicons } from '@expo/vector-icons';
 import type { Verse } from '@lawhi/shared';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Modal, Pressable, StyleSheet, View } from 'react-native';
-import { AppText, Button, ListRow } from '../../components/ui';
-import { MIN_TOUCH, spacing } from '../../constants/theme';
-import { useTheme } from '../../hooks/useTheme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Icon, IconButton, LawhiText, ProgressBar, Tappable } from '../../components/ui';
+import { radius, spacing } from '../../constants/theme';
+import { useIsDark, useTheme } from '../../hooks/useTheme';
 import { contentRepository } from '../../repositories/contentRepository';
 import { recitation, useRecitationStore } from '../../services/audio/recitationPlayer';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { localized, useLocale } from '../../utils/localize';
 
+/** Floating recitation capsule: present, but quiet. */
 export function PlayerBar({ verses }: { verses: Verse[] }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const dark = useIsDark();
   const locale = useLocale();
+  const insets = useSafeAreaInsets();
   const riwaya = useSettingsStore((s) => s.riwaya);
   const reciterId = useSettingsStore((s) => s.reciterByRiwaya[riwaya]);
   const setReciter = useSettingsStore((s) => s.setReciter);
@@ -24,112 +27,129 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
   const reciters = contentRepository.reciters(riwaya);
   const reciter = reciters.find((r) => r.id === reciterId) ?? reciters[0];
   const current = queue[index];
+  const capsule = [
+    styles.capsule,
+    {
+      backgroundColor: theme.surfaceElevated,
+      borderColor: theme.border,
+      marginBottom: Math.max(insets.bottom, spacing.md),
+      shadowColor: theme.shadow,
+      shadowOpacity: dark ? 0.5 : 0.14,
+    },
+  ];
 
   if (!reciter) {
     // Honest state: no verified Warsh recitation is available yet.
     return (
-      <View style={[styles.bar, { borderTopColor: theme.border, backgroundColor: theme.surface }]}>
-        <AppText variant="small">{t('quran.audio.noReciterForRiwaya')}</AppText>
+      <View style={[capsule, { paddingHorizontal: spacing.lg, minHeight: 56 }]}>
+        <Icon name="volume" size={18} color={theme.muted} />
+        <LawhiText variant="caption" tone="secondary" style={{ flex: 1 }}>
+          {t('quran.audio.noReciterForRiwaya')}
+        </LawhiText>
       </View>
     );
   }
 
-  const start = () => void recitation.start(reciter, verses, 0);
-  const progress = duration > 0 ? position / duration : 0;
-  const busy = status === 'loading';
+  const caption =
+    status === 'error'
+      ? t(error === 'network' ? 'quran.audio.networkError' : 'quran.audio.playbackError')
+      : current
+        ? `${t('quran.verseNumber', { number: current.verse })}${status === 'loading' ? ` · ${t('common.loading')}` : ''}`
+        : t('quran.audio.tapToListen');
 
   return (
-    <View style={[styles.bar, { borderTopColor: theme.border, backgroundColor: theme.surface }]}>
-      {status !== 'idle' ? (
-        <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-          <View
-            style={[
-              styles.progressFill,
-              { backgroundColor: theme.primary, width: `${progress * 100}%` },
-            ]}
-          />
-        </View>
-      ) : null}
-      <View style={styles.row}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('quran.audio.chooseReciter')}
-          onPress={() => setPicking(true)}
-          style={{ flex: 1, minHeight: MIN_TOUCH, justifyContent: 'center' }}
-        >
-          <AppText numberOfLines={1}>{localized(reciter, 'name', locale)}</AppText>
-          <AppText variant="small" numberOfLines={1}>
-            {status === 'error'
-              ? t(error === 'network' ? 'quran.audio.networkError' : 'quran.audio.playbackError')
-              : current
-                ? `${current.surah}:${current.verse}${busy ? ` · ${t('common.loading')}` : ''}`
-                : t('quran.audio.tapToListen')}
-          </AppText>
-        </Pressable>
-        {status === 'idle' ? (
-          <IconButton icon="play" label={t('quran.audio.play')} onPress={start} />
-        ) : (
-          <>
-            <IconButton
-              icon="play-skip-back"
-              label={t('quran.audio.previous')}
-              onPress={() => void recitation.previous()}
-            />
-            <IconButton
-              icon={status === 'playing' ? 'pause' : status === 'error' ? 'refresh' : 'play'}
-              label={t(
-                status === 'playing'
-                  ? 'quran.audio.pause'
-                  : status === 'error'
-                    ? 'common.retry'
-                    : 'quran.audio.play',
-              )}
-              onPress={() => void recitation.toggle()}
-            />
-            <IconButton
-              icon="play-skip-forward"
-              label={t('quran.audio.next')}
-              onPress={() => void recitation.next()}
-            />
-            <IconButton
-              icon="stop"
-              label={t('quran.audio.stop')}
-              onPress={() => recitation.stop()}
-            />
-          </>
+    <View style={capsule}>
+      <Tappable
+        onPress={() => (status === 'idle' ? void recitation.start(reciter, verses, 0) : void recitation.toggle())}
+        accessibilityRole="button"
+        accessibilityLabel={t(
+          status === 'playing' ? 'quran.audio.pause' : status === 'error' ? 'common.retry' : 'quran.audio.play',
         )}
-      </View>
+        pressedScale={0.9}
+        haptic
+        style={[styles.play, { backgroundColor: theme.primary }]}
+      >
+        <Icon
+          name={status === 'playing' ? 'pause' : status === 'error' ? 'reset' : 'play'}
+          size={18}
+          color={theme.onPrimary}
+          filled={status !== 'error'}
+        />
+      </Tappable>
+      <Pressable
+        onPress={() => setPicking(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t('quran.audio.chooseReciter')}
+        style={styles.info}
+      >
+        <LawhiText variant="bodyStrong" numberOfLines={1} style={{ fontSize: 14 }}>
+          {localized(reciter, 'name', locale)}
+        </LawhiText>
+        <LawhiText
+          variant="caption"
+          tone={status === 'error' ? 'danger' : 'muted'}
+          numberOfLines={1}
+          style={{ fontSize: 12 }}
+        >
+          {caption}
+        </LawhiText>
+        {status !== 'idle' ? (
+          <ProgressBar
+            value={duration > 0 ? position / duration : 0}
+            height={2}
+            color={theme.accent}
+            style={{ marginTop: 4 }}
+          />
+        ) : null}
+      </Pressable>
+      {status !== 'idle' ? (
+        <>
+          <IconButton icon="previous" label={t('quran.audio.previous')} onPress={() => void recitation.previous()} size={19} />
+          <IconButton icon="next" label={t('quran.audio.next')} onPress={() => void recitation.next()} size={19} />
+          <IconButton icon="close" label={t('quran.audio.stop')} onPress={() => recitation.stop()} size={19} />
+        </>
+      ) : (
+        <IconButton icon="chevronForward" label={t('quran.audio.chooseReciter')} onPress={() => setPicking(true)} size={18} />
+      )}
 
       <Modal visible={picking} animationType="slide" onRequestClose={() => setPicking(false)}>
-        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: spacing.xl }}>
-          <AppText variant="heading" style={{ padding: spacing.lg }} accessibilityRole="header">
-            {t('quran.audio.chooseReciter')}
-          </AppText>
+        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.lg }}>
+          <View style={styles.pickerHeader}>
+            <LawhiText variant="heading" accessibilityRole="header" style={{ flex: 1 }}>
+              {t('quran.audio.chooseReciter')}
+            </LawhiText>
+            <IconButton icon="close" label={t('common.close')} onPress={() => setPicking(false)} />
+          </View>
           <FlatList
             data={reciters}
             keyExtractor={(r) => r.id}
-            renderItem={({ item }) => (
-              <ListRow
-                title={localized(item, 'name', locale)}
-                subtitle={locale === 'ar' ? undefined : item.nameAr}
-                trailing={
-                  item.id === reciter.id ? (
-                    <Ionicons name="checkmark" size={22} color={theme.primary} />
-                  ) : null
-                }
-                onPress={() => {
-                  setReciter(riwaya, item.id);
-                  setPicking(false);
-                  void recitation.changeReciter(item);
-                }}
-              />
-            )}
-          />
-          <Button
-            title={t('common.close')}
-            variant="secondary"
-            onPress={() => setPicking(false)}
-            style={{ margin: spacing.lg }}
+            contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}
+            renderItem={({ item }) => {
+              const selected = item.id === reciter.id;
+              return (
+                <Tappable
+                  onPress={() => {
+                    setReciter(riwaya, item.id);
+                    setPicking(false);
+                    void recitation.changeReciter(item);
+                  }}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                  pressedScale={0.99}
+                  style={[styles.reciterRow, { borderBottomColor: theme.divider }]}
+                >
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <LawhiText variant="subtitle">{localized(item, 'name', locale)}</LawhiText>
+                    {locale === 'ar' ? null : (
+                      <LawhiText variant="caption" tone="secondary">
+                        {item.nameAr}
+                      </LawhiText>
+                    )}
+                  </View>
+                  {selected ? <Icon name="check" size={20} color={theme.primary} /> : null}
+                </Tappable>
+              );
+            }}
           />
         </View>
       </Modal>
@@ -137,41 +157,35 @@ export function PlayerBar({ verses }: { verses: Verse[] }) {
   );
 }
 
-function IconButton({
-  icon,
-  label,
-  onPress,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress: () => void;
-}) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={styles.iconButton}
-    >
-      <Ionicons name={icon} size={24} color={theme.primary} />
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  bar: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  progressTrack: { height: 3, borderRadius: 2, overflow: 'hidden', marginBottom: spacing.xs },
-  progressFill: { height: 3 },
-  iconButton: {
-    minWidth: MIN_TOUCH,
-    minHeight: MIN_TOUCH,
+  capsule: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: spacing.sm,
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingStart: spacing.sm,
+    paddingEnd: spacing.xs,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  play: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  info: { flex: 1, gap: 1, justifyContent: 'center', minHeight: 44 },
+  pickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  reciterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    minHeight: 60,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });

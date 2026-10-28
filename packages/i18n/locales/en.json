@@ -21,7 +21,6 @@
   },
   "home": {
     "nextPrayer": "Next prayer",
-    "inDuration": "in {{hours}} h {{minutes}} min",
     "setLocation": "Choose your city to see prayer times.",
     "shortcuts": {
       "quran": "Quran",
@@ -29,8 +28,26 @@
       "qibla": "Qibla",
       "adhkar": "Adhkar",
       "library": "Library",
-      "donations": "Donations"
-    }
+      "donations": "Sadgue (Donations)"
+    },
+    "greeting": "As-salāmu ʿalaykum",
+    "setLocationTitle": "Where do you pray?",
+    "inHoursMinutes": "in {{hours}} h {{minutes}}",
+    "inMinutes": "in {{minutes}} min",
+    "quranSection": "Your lawh",
+    "allSurahs": "All surahs",
+    "startReading": "Start reading",
+    "resume": "Resume",
+    "open": "Open",
+    "qiblaBearing": "{{degrees}}° from north",
+    "qiblaNoPlace": "Location needed",
+    "now": "Right now",
+    "adhkarProgress": "{{done}} of {{total}} today",
+    "verseOfDay": "Verse of the day",
+    "quranHint": "{{count}} surahs, to read and listen",
+    "libraryHint": "{{count}} books, excerpts readable offline",
+    "adhkarHint": "Morning, evening, supplications and tasbih",
+    "donationsHint": "Support a project, in MRU"
   },
   "quran": {
     "search": "Search the Quran",
@@ -62,6 +79,8 @@
     "removeBookmark": "Remove bookmark",
     "verseA11y": "Surah {{surah}}, verse {{verse}}",
     "verseHint": "Opens verse actions",
+    "previousSurah": "Previous surah",
+    "nextSurah": "Next surah",
     "noResults": "No verse found.",
     "resultsCount": "{{count}} result(s)",
     "resultsLimited": "First {{count}} results — refine your search",
@@ -79,7 +98,8 @@
       "networkError": "Audio unavailable: check your connection.",
       "playbackError": "This verse could not be played.",
       "noReciterForRiwaya": "No verified Warsh recitation is available yet. The Warsh text can still be read."
-    }
+    },
+    "overline": "The Noble Quran"
   },
   "prayer": {
     "names": {
@@ -130,7 +150,12 @@
     "notificationsWebUnsupported": "Prayer notifications are available in the Android and iOS app.",
     "cityPlaceholder": "City name (e.g. Nouakchott)",
     "citySearchOffline": "City search needs the Internet. Offline, use GPS.",
-    "noCityFound": "No city found."
+    "noCityFound": "No city found.",
+    "title": "Prayer times",
+    "today": "Today",
+    "tomorrow": "tomorrow",
+    "calculation": "Calculation",
+    "sunriseHint": "end of Fajr time"
   },
   "qibla": {
     "needLocationTitle": "Location needed",
@@ -144,7 +169,17 @@
     "permissionDenied": "The compass needs location permission.",
     "noSensor": "This device has no usable compass sensor. Use the direction: {{degrees}}° from north (with a regular compass).",
     "turnRight": "Turn {{degrees}}° to the right",
-    "turnLeft": "Turn {{degrees}}° to the left"
+    "turnLeft": "Turn {{degrees}}° to the left",
+    "direction": "Direction",
+    "distanceShort": "Distance",
+    "fromNorth": "from north",
+    "staticHint": "Without a compass: hold the phone flat with the top of the screen facing north.",
+    "cardinals": {
+      "n": "N",
+      "e": "E",
+      "s": "S",
+      "w": "W"
+    }
   },
   "adhkar": {
     "adhkar": "Adhkar",
@@ -164,7 +199,13 @@
     "tasbih": "Tasbih",
     "tasbihHint": "Free counter",
     "tapToCount": "Tap to count",
-    "tasbihA11y": "Tasbih: {{count}}. Tap to count."
+    "tasbihA11y": "Tasbih: {{count}}. Tap to count.",
+    "overline": "Remembrance of Allah",
+    "start": "Start",
+    "continue": "Continue",
+    "completed": "Completed",
+    "cycle": "Round {{n}} · 33 per round",
+    "clearSearch": "Clear search"
   },
   "library": {
     "title": "Library",
@@ -193,10 +234,21 @@
     "cannotOpen": "This PDF cannot be opened",
     "cannotOpenHint": "Delete it and download it again.",
     "webPdfTitle": "The PDF opens in your browser's viewer.",
-    "nativeReaderUnavailable": "The built-in PDF reader is not available in Expo Go: the book opens in the phone's viewer."
+    "nativeReaderUnavailable": "The built-in PDF reader is not available in Expo Go: the book opens in the phone's viewer.",
+    "overline": "Hadith and adhkar",
+    "search": "Search the library",
+    "searchPlaceholder": "Title, chapter or Arabic text",
+    "recent": "Continue",
+    "all": "All",
+    "hadith": "Hadith",
+    "adhkarBooks": "Adhkar",
+    "noResults": "No results.",
+    "atPage": "Page {{page}}",
+    "pdfOnly": "PDF",
+    "offline": "Offline"
   },
   "donations": {
-    "title": "Donations",
+    "title": "Sadgue (Donations)",
     "featured": "Priority project",
     "howItWorks": "Donations are made by mobile transfer (Bankily, Masrivi…). After the transfer, add the reference or a screenshot: an administrator checks and confirms your donation.",
     "collected": "Confirmed donations: {{collected}}",
@@ -263,6 +315,63 @@
       "donorName": "Name too short or too long.",
       "donorPhone": "Invalid Mauritanian number (8 digits starting with 2, 3 or 4).",
       "reference": "Invalid reference (3 to 64 characters)."
+    },
+    "balanceLabel": "Total donations",
+    "updatedOn": "Updated on {{date}}",
+    "notUpdatedYet": "Not updated yet",
+    "balanceA11y": "Total donations: {{amount}}. {{updated}}",
+    "giveTitle": "Make a donation",
+    "giveViaBankily": "Send your donation via Bankily to this number",
+    "copy": "Copy",
+    "numberCopied": "Number copied ✓",
+    "copyNumberA11y": "Copy the Bankily number {{number}}",
+    "noBankily": "The Bankily number will appear here once it has been set up.",
+    "projects": "Projects and events",
+    "causeStatus": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed"
+    },
+    "goalProgress": "{{collected}} collected of {{goal}}",
+    "admin": {
+      "manage": "Manage",
+      "title": "Sadgue management",
+      "summaryTitle": "Balance and Bankily",
+      "totalLabel": "Current total amount (MRU)",
+      "saveTotal": "Update the total",
+      "bankilyLabel": "Bankily number",
+      "saveNumber": "Save the number",
+      "saved": "Saved ✓",
+      "projects": "Projects",
+      "newProject": "New project",
+      "editProject": "Edit project",
+      "titleFr": "Title (French)",
+      "titleAr": "Title (Arabic)",
+      "titleEn": "Title (English)",
+      "descriptionFr": "Description (French)",
+      "descriptionAr": "Description (Arabic)",
+      "descriptionEn": "Description (English)",
+      "status": "Status",
+      "eventDate": "Date (optional)",
+      "eventDateHint": "Format YYYY-MM-DD, e.g. 2026-12-20",
+      "goal": "Goal in MRU (optional)",
+      "collected": "Collected so far (MRU)",
+      "visible": "Visible in the app",
+      "featured": "Featured",
+      "save": "Save",
+      "create": "Create the project",
+      "delete": "Delete the project",
+      "deleteTitle": "Delete this project?",
+      "deleteMessage": "This cannot be undone.",
+      "archived": "This project already has recorded donations: it was hidden instead of deleted.",
+      "image": "Image",
+      "addImage": "Choose an image",
+      "changeImage": "Change the image",
+      "removeImage": "Remove the image",
+      "imageHint": "JPG, PNG or WebP, 2 MB max. The image can be added once the project exists.",
+      "textsRequired": "Titles and descriptions are required in all three languages (2 characters minimum).",
+      "invalidDate": "Invalid date (YYYY-MM-DD).",
+      "hidden": "Hidden"
     }
   },
   "settings": {
@@ -360,6 +469,16 @@
     "proof_type_not_allowed": "Unsupported format: JPG, PNG, WebP or PDF only.",
     "proof_storage_unavailable": "Sending proofs is temporarily unavailable.",
     "geocoding_unavailable": "City search is temporarily unavailable.",
-    "internal_error": "Server error. Try again later."
+    "internal_error": "Server error. Try again later.",
+    "cause_not_found": "This project no longer exists.",
+    "cause_slug_taken": "A project already has this name. Change the French title.",
+    "image_too_large": "Image too large (2 MB max).",
+    "image_type_not_allowed": "Format not accepted: JPG, PNG or WebP only.",
+    "image_missing": "Choose an image.",
+    "image_storage_unavailable": "Image storage is not available right now.",
+    "image_not_found": "Image not found."
+  },
+  "intro": {
+    "skip": "Tap to skip"
   }
 }

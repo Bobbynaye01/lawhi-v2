@@ -1,11 +1,11 @@
-import { Ionicons } from '@expo/vector-icons';
 import { localDateString } from '@lawhi/shared';
-import * as Haptics from 'expo-haptics';
 import { useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { AppText, Button, Card, MessageState, Screen } from '../../components/ui';
-import { fonts, MIN_TOUCH, radius, spacing } from '../../constants/theme';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DhikrCounter } from '../../components/adhkar/DhikrCounter';
+import { ArabicText, IconButton, LawhiText, MessageState, ProgressBar } from '../../components/ui';
+import { spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import type { RootScreenProps } from '../../navigation/types';
 import { contentRepository } from '../../repositories/contentRepository';
@@ -17,6 +17,7 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
   const { t } = useTranslation();
   const theme = useTheme();
   const locale = useLocale();
+  const insets = useSafeAreaInsets();
   const fontScale = useSettingsStore((s) => s.quranFontScale);
   const category = contentRepository.category(route.params.id);
   const counts = useAdhkarStore((s) => s.counts);
@@ -25,126 +26,98 @@ export function AdhkarCategoryScreen({ route, navigation }: RootScreenProps<'Adh
   const { increment, resetCategory, toggleFavorite } = useAdhkarStore.getState();
 
   useLayoutEffect(() => {
-    if (category)
-      navigation.setOptions({
-        title: locale === 'ar' ? category.titleAr : localized(category, 'title', locale),
-      });
-  }, [navigation, category, locale]);
+    if (!category) return;
+    navigation.setOptions({
+      title: locale === 'ar' ? category.titleAr : localized(category, 'title', locale),
+      headerRight: () => (
+        <IconButton
+          icon="reset"
+          label={t('adhkar.reset')}
+          onPress={() => resetCategory(category.items.map((d) => d.id))}
+        />
+      ),
+    });
+  }, [navigation, category, locale, t, resetCategory]);
 
   if (!category) return <MessageState title={t('errors.not_found')} />;
 
   const isToday = day === localDateString(new Date());
   const countOf = (id: string) => (isToday ? (counts[id] ?? 0) : 0);
   const done = category.items.filter((d) => countOf(d.id) >= d.repetitions).length;
+  const total = category.items.length;
 
   return (
-    <Screen scroll={false}>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
       <View style={styles.progress}>
-        <AppText accessibilityLiveRegion="polite">
-          {t('adhkar.progress', { done, total: category.items.length })}
-        </AppText>
-        <Button
-          title={t('adhkar.reset')}
-          variant="secondary"
-          onPress={() => resetCategory(category.items.map((d) => d.id))}
-        />
+        <LawhiText variant="caption" tone="secondary" accessibilityLiveRegion="polite">
+          {t('adhkar.progress', { done, total })}
+        </LawhiText>
+        <ProgressBar value={total ? done / total : 0} color={done === total ? theme.success : theme.accent} height={3} />
       </View>
       <FlatList
         data={category.items}
         keyExtractor={(d) => d.id}
-        contentContainerStyle={{ padding: spacing.lg, gap: spacing.md }}
-        renderItem={({ item }) => {
+        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: theme.divider }]} />
+        )}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item, index }) => {
           const count = countOf(item.id);
           const complete = count >= item.repetitions;
           const favorite = favorites.includes(item.id);
           const translation =
             locale === 'fr' ? item.translationFr : locale === 'en' ? item.translationEn : null;
           return (
-            <Card style={complete ? { borderColor: theme.success } : undefined}>
-              {item.title ? <AppText variant="heading">{item.title}</AppText> : null}
-              <AppText
-                style={[
-                  styles.arabic,
-                  { color: theme.quranText, fontSize: 22 * fontScale, lineHeight: 42 * fontScale },
-                ]}
-              >
-                {item.arabicText}
-              </AppText>
-              {translation ? <AppText>{translation}</AppText> : null}
-              {item.virtue ? <AppText variant="muted">{item.virtue}</AppText> : null}
-              <AppText variant="small">{t('adhkar.source', { source: item.source })}</AppText>
-              <View style={styles.footer}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    favorite ? t('adhkar.removeFavorite') : t('adhkar.addFavorite')
-                  }
+            <View style={[styles.item, complete && { opacity: 0.72 }]}>
+              <View style={styles.meta}>
+                <LawhiText variant="overline" tone="muted">
+                  {index + 1} / {total}
+                  {item.repetitions > 1 ? `  ·  × ${item.repetitions}` : ''}
+                </LawhiText>
+                <IconButton
+                  icon="star"
+                  filled={favorite}
+                  tone={favorite ? 'accent' : 'default'}
+                  size={18}
+                  label={favorite ? t('adhkar.removeFavorite') : t('adhkar.addFavorite')}
                   onPress={() => toggleFavorite(item.id)}
-                  style={styles.icon}
-                >
-                  <Ionicons
-                    name={favorite ? 'star' : 'star-outline'}
-                    size={22}
-                    color={theme.accent}
-                  />
-                </Pressable>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t('adhkar.counterA11y', { count, total: item.repetitions })}
-                  accessibilityState={{ disabled: complete }}
-                  disabled={complete}
-                  onPress={() => {
-                    const next = increment(item.id, item.repetitions);
-                    void Haptics.impactAsync(
-                      next >= item.repetitions
-                        ? Haptics.ImpactFeedbackStyle.Heavy
-                        : Haptics.ImpactFeedbackStyle.Light,
-                    ).catch(() => undefined);
-                  }}
-                  style={[
-                    styles.counter,
-                    { backgroundColor: complete ? theme.success : theme.primary },
-                  ]}
-                >
-                  <AppText style={{ color: theme.onPrimary, fontWeight: '700', fontSize: 18 }}>
-                    {complete ? '✓' : `${count} / ${item.repetitions}`}
-                  </AppText>
-                </Pressable>
+                />
               </View>
-            </Card>
+              {item.title ? <LawhiText variant="title">{item.title}</LawhiText> : null}
+              <ArabicText size={22 * fontScale}>{item.arabicText}</ArabicText>
+              {translation ? <LawhiText tone="secondary">{translation}</LawhiText> : null}
+              {item.virtue ? (
+                <View style={[styles.virtue, { borderColor: theme.accent }]}>
+                  <LawhiText variant="body" tone="secondary">
+                    {item.virtue}
+                  </LawhiText>
+                </View>
+              ) : null}
+              <View style={styles.footer}>
+                <LawhiText variant="caption" tone="muted" style={{ flex: 1 }}>
+                  {t('adhkar.source', { source: item.source })}
+                </LawhiText>
+                <DhikrCounter
+                  count={count}
+                  total={item.repetitions}
+                  onIncrement={() => increment(item.id, item.repetitions)}
+                  accessibilityLabel={t('adhkar.counterA11y', { count, total: item.repetitions })}
+                />
+              </View>
+            </View>
           );
         }}
       />
-    </Screen>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  progress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-  },
-  arabic: { fontFamily: fonts.arabic, textAlign: 'right', writingDirection: 'rtl' },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.sm,
-  },
-  icon: {
-    minWidth: MIN_TOUCH,
-    minHeight: MIN_TOUCH,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  counter: {
-    minWidth: 110,
-    minHeight: MIN_TOUCH + 4,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  progress: { paddingHorizontal: spacing.lg, paddingBottom: spacing.md, gap: spacing.sm },
+  item: { paddingHorizontal: spacing.lg, paddingVertical: spacing.xl, gap: spacing.md },
+  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: -spacing.sm },
+  virtue: { borderStartWidth: 2, paddingStart: spacing.md },
+  footer: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginTop: spacing.xs },
+  separator: { height: StyleSheet.hairlineWidth, marginHorizontal: spacing.lg },
 });

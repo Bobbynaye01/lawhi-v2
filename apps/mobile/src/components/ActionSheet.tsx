@@ -1,13 +1,16 @@
 import { useTranslation } from 'react-i18next';
-import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MIN_TOUCH, radius, spacing } from '../constants/theme';
 import { useTheme } from '../hooks/useTheme';
-import { AppText } from './ui';
+import { Icon, LawhiText } from './ui';
 
 export interface SheetAction {
   label: string;
   onPress: () => void;
   destructive?: boolean;
+  /** Current choice in a picker: shown with a check mark. */
+  selected?: boolean;
 }
 
 /** Cross-platform action sheet (Alert buttons are ignored by react-native-web). */
@@ -24,42 +27,45 @@ export function ActionSheet({
 }) {
   const theme = useTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')}>
         <Pressable
-          style={[styles.sheet, { backgroundColor: theme.surface }]}
+          style={[styles.sheet, { backgroundColor: theme.surfaceElevated, paddingBottom: insets.bottom + spacing.md }]}
           onPress={() => undefined}
         >
-          <AppText
-            variant="heading"
-            accessibilityRole="header"
-            style={{ marginBottom: spacing.sm }}
-          >
+          <View style={[styles.grabber, { backgroundColor: theme.border }]} />
+          <LawhiText variant="title" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
             {title}
-          </AppText>
+          </LawhiText>
           <ScrollView style={{ maxHeight: 420 }}>
             {actions.map((a) => (
               <Pressable
                 key={a.label}
                 accessibilityRole="button"
+                accessibilityState={a.selected === undefined ? undefined : { selected: a.selected }}
                 onPress={() => {
                   onClose();
                   a.onPress();
                 }}
                 style={({ pressed }) => [
                   styles.action,
-                  { backgroundColor: pressed ? theme.card : 'transparent' },
+                  { backgroundColor: pressed ? theme.surfaceSunken : 'transparent' },
                 ]}
               >
-                <AppText style={{ color: a.destructive ? theme.danger : theme.text }}>
+                <LawhiText
+                  variant={a.selected ? 'bodyStrong' : 'body'}
+                  style={{ flex: 1, color: a.destructive ? theme.danger : theme.textPrimary }}
+                >
                   {a.label}
-                </AppText>
+                </LawhiText>
+                {a.selected ? <Icon name="check" size={18} color={theme.primary} /> : null}
               </Pressable>
             ))}
           </ScrollView>
           <Pressable accessibilityRole="button" onPress={onClose} style={styles.action}>
-            <AppText variant="muted">{t('common.cancel')}</AppText>
+            <LawhiText tone="secondary">{t('common.cancel')}</LawhiText>
           </Pressable>
         </Pressable>
       </Pressable>
@@ -74,6 +80,8 @@ export function confirmAsync(options: {
   confirm: string;
   cancel: string;
   destructive?: boolean;
+  /** Current choice in a picker: shown with a check mark. */
+  selected?: boolean;
 }) {
   if (Platform.OS === 'web') {
     return Promise.resolve(
@@ -93,16 +101,18 @@ export function confirmAsync(options: {
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(10,7,5,0.45)', justifyContent: 'flex-end' },
+  grabber: { width: 40, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: spacing.sm },
   sheet: {
     padding: spacing.lg,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
     gap: spacing.xs,
   },
   action: {
     minHeight: MIN_TOUCH + 4,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: spacing.sm,
     borderRadius: radius.sm,
   },

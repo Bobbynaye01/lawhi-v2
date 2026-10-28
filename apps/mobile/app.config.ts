@@ -32,10 +32,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.lawhi.lawhi',
     versionCode: 2,
     adaptiveIcon: {
-      backgroundColor: '#123B2F',
+      backgroundColor: '#D8BB8C',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
-      monochromeImage: './assets/android-icon-monochrome.png',
     },
     permissions: [
       'ACCESS_COARSE_LOCATION',
@@ -53,6 +52,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-localization',
+    [
+      'expo-splash-screen',
+      // Empty, dark: the first frame of the animated intro (src/components/intro).
+      { backgroundColor: '#0D0906', image: './assets/splash-empty.png', imageWidth: 1 },
+    ],
     ['expo-audio', { enableBackgroundPlayback: true }],
     'expo-background-task',
     'expo-font',

@@ -1,4 +1,13 @@
-import type { CreateDonationInput, DonationStatus, Locale, PaymentOperator } from '@lawhi/shared';
+import type {
+  CauseStatus,
+  CreateDonationInput,
+  DonationStatus,
+  DonationSummary,
+  Locale,
+  PaymentOperator,
+  UpdateDonationSummaryInput,
+} from '@lawhi/shared';
+import { config } from '../../constants/config';
 import { apiRequest } from './client';
 
 export interface PublicConfig {
@@ -16,9 +25,37 @@ export interface Cause {
   descriptionFr: string;
   descriptionEn: string;
   goalAmount: number | null;
+  /** Collected so far in MRU, entered by an admin. */
+  collectedAmount: number;
+  status: CauseStatus;
+  /** ISO date-time at midnight UTC, or null. */
+  eventDate: string | null;
+  imageUrl: string | null;
   featured: boolean;
-  confirmedAmount: number;
-  confirmedCount: number;
+  active: boolean;
+  sortOrder: number;
+}
+
+/** What an admin sends to create or edit a cause (date as YYYY-MM-DD). */
+export type CauseInput = Pick<
+  Cause,
+  | 'titleAr'
+  | 'titleFr'
+  | 'titleEn'
+  | 'descriptionAr'
+  | 'descriptionFr'
+  | 'descriptionEn'
+  | 'goalAmount'
+  | 'collectedAmount'
+  | 'status'
+  | 'featured'
+  | 'active'
+  | 'sortOrder'
+> & { eventDate: string | null };
+
+/** Images stored on the API's disk (development) come back as relative paths. */
+export function mediaUrl(url: string): string {
+  return url.startsWith('/') ? `${config.apiUrl}${url}` : url;
 }
 
 export interface PaymentMethod {
@@ -69,6 +106,34 @@ export interface Me {
 export const api = {
   publicConfig: () => apiRequest<PublicConfig>('/settings'),
   causes: () => apiRequest<Cause[]>('/donations/causes'),
+  donationSummary: () => apiRequest<DonationSummary>('/donations/summary'),
+  admin: {
+    causes: () => apiRequest<Cause[]>('/admin/causes', { auth: true }),
+    createCause: (input: CauseInput & { slug: string }) =>
+      apiRequest<Cause>('/admin/causes', { method: 'POST', body: input, auth: true }),
+    updateCause: (id: string, input: Partial<CauseInput>) =>
+      apiRequest<Cause>(`/admin/causes/${id}`, { method: 'PATCH', body: input, auth: true }),
+    deleteCause: (id: string) =>
+      apiRequest<{ deleted: boolean; archived: boolean }>(`/admin/causes/${id}`, {
+        method: 'DELETE',
+        auth: true,
+      }),
+    uploadCauseImage: (id: string, form: FormData) =>
+      apiRequest<Cause>(`/admin/causes/${id}/image`, {
+        method: 'POST',
+        form,
+        auth: true,
+        timeoutMs: 60000,
+      }),
+    removeCauseImage: (id: string) =>
+      apiRequest<Cause>(`/admin/causes/${id}/image`, { method: 'DELETE', auth: true }),
+    updateSummary: (input: UpdateDonationSummaryInput) =>
+      apiRequest<DonationSummary>('/admin/donations-summary', {
+        method: 'PUT',
+        body: input,
+        auth: true,
+      }),
+  },
   paymentMethods: () => apiRequest<PaymentMethod[]>('/donations/payment-methods'),
   createDonation: (input: CreateDonationInput) =>
     apiRequest<Donation>('/donations', { method: 'POST', body: input, auth: true }),

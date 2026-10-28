@@ -1,16 +1,27 @@
-import { Amiri_400Regular, Amiri_700Bold, useFonts } from '@expo-google-fonts/amiri';
+import { Amiri_400Regular } from '@expo-google-fonts/amiri/400Regular';
+import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran/400Regular';
+import { Fraunces_500Medium } from '@expo-google-fonts/fraunces/500Medium';
+import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces/600SemiBold';
+import { IBMPlexSansArabic_400Regular } from '@expo-google-fonts/ibm-plex-sans-arabic/400Regular';
+import { IBMPlexSansArabic_500Medium } from '@expo-google-fonts/ibm-plex-sans-arabic/500Medium';
+import { IBMPlexSansArabic_600SemiBold } from '@expo-google-fonts/ibm-plex-sans-arabic/600SemiBold';
+import { Manrope_400Regular } from '@expo-google-fonts/manrope/400Regular';
+import { Manrope_500Medium } from '@expo-google-fonts/manrope/500Medium';
+import { Manrope_600SemiBold } from '@expo-google-fonts/manrope/600SemiBold';
+import { Manrope_700Bold } from '@expo-google-fonts/manrope/700Bold';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { useFonts } from 'expo-font';
 import * as Linking from 'expo-linking';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { lightPalette } from './src/constants/theme';
-import { useIsDark } from './src/hooks/useTheme';
+import { IntroSplash } from './src/components/intro/IntroSplash';
+import { useIsDark, useTheme } from './src/hooks/useTheme';
 import { useNotificationSync } from './src/hooks/useNotificationSync';
 import { detectDeviceLocale, i18n, initI18n } from './src/i18n';
 import { navigationRef, RootNavigator } from './src/navigation/RootNavigator';
@@ -18,7 +29,12 @@ import { handleAuthLink } from './src/services/authLinks';
 import { supabase } from './src/services/supabase';
 import { registerBackgroundTasks } from './src/services/backgroundTasks';
 import { reconcileDownloads } from './src/services/bookDownloads';
+import { useIntroStore } from './src/stores/introStore';
 import { useSettingsStore } from './src/stores/settingsStore';
+
+// The dark native splash stays until fonts and settings are ready; the animated
+// intro then starts from the same dark frame.
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -79,35 +95,44 @@ function useAuthLinks(ready: boolean) {
 
 function AppShell() {
   const isDark = useIsDark();
+  const theme = useTheme();
   const [navReady, setNavReady] = useState(false);
+  const introDone = useIntroStore((s) => s.done);
+  const markIntroDone = useIntroStore((s) => s.markDone);
   useNotificationSync();
   useAuthLinks(navReady);
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style={!introDone || isDark ? 'light' : 'dark'} />
       <RootNavigator onReady={() => setNavReady(true)} />
+      {introDone ? null : <IntroSplash background={theme.background} onDone={markIntroDone} />}
     </>
   );
 }
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ Amiri_400Regular, Amiri_700Bold });
+  const [fontsLoaded, fontError] = useFonts({
+    Amiri_400Regular,
+    AmiriQuran_400Regular,
+    Fraunces_500Medium,
+    Fraunces_600SemiBold,
+    IBMPlexSansArabic_400Regular,
+    IBMPlexSansArabic_500Medium,
+    IBMPlexSansArabic_600SemiBold,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+  });
   const hydrated = useSettingsHydrated();
+  const ready = (fontsLoaded || Boolean(fontError)) && hydrated && i18n.isInitialized;
 
-  if (!fontsLoaded || !hydrated || !i18n.isInitialized) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: lightPalette.background,
-        }}
-      >
-        <ActivityIndicator color={lightPalette.primary} size="large" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (ready) void SplashScreen.hideAsync().catch(() => undefined);
+  }, [ready]);
+
+  // Native splash (same dark colour as the intro's first frame) is still shown.
+  if (!ready) return null;
 
   return (
     <SafeAreaProvider>

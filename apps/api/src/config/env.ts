@@ -12,7 +12,9 @@ const envSchema = z
     /** Server-only. Used for Storage (donation proofs) and account deletion. */
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
     SUPABASE_PROOFS_BUCKET: z.string().default('donation-proofs'),
-    /** Dev/test only: store proofs on disk instead of Supabase Storage. */
+    /** Public bucket for the cover images of donation causes. */
+    SUPABASE_CAUSE_IMAGES_BUCKET: z.string().default('cause-images'),
+    /** Dev/test only: store proofs and cause images on disk instead of Supabase Storage. */
     LOCAL_STORAGE_DIR: z.string().optional(),
     NOMINATIM_USER_AGENT: z.string().default('Lawhi/1.0 (contact: admin@lawhi.app)'),
   })

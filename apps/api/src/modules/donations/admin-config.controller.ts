@@ -1,21 +1,31 @@
+import { randomUUID } from 'node:crypto';
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
+  Delete,
   Get,
+  Inject,
   Injectable,
   NotFoundException,
   Param,
   Patch,
   Post,
   Put,
+  ServiceUnavailableException,
   UnprocessableEntityException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { updatePaymentMethodSchema } from '@lawhi/shared';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { updateDonationSummarySchema, updatePaymentMethodSchema } from '@lawhi/shared';
 import type { z } from 'zod';
 import { Roles } from '../../common/decorators/auth.decorators';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PrismaService } from '../../database/prisma.service';
 import { DONATION_PRESETS_KEY } from '../settings/settings.module';
+import { CAUSE_IMAGE_STORAGE, type CauseImageStorage } from '../storage/cause-image-storage';
 import {
   createCauseSchema,
   donationPresetsSchema,
@@ -24,12 +34,42 @@ import {
   type CreateCauseInput,
   type UpdateCauseInput,
 } from './donations.schemas';
+import { DONATION_TOTAL_KEY, DonationsService } from './donations.service';
+import { detectImageType, MAX_CAUSE_IMAGE_BYTES } from './proof-file';
 
 type UpdatePaymentMethod = z.output<typeof updatePaymentMethodSchema>;
+type UpdateDonationSummary = z.output<typeof updateDonationSummarySchema>;
 
 @Injectable()
 export class DonationConfigService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly donations: DonationsService,
+    @Inject(CAUSE_IMAGE_STORAGE) private readonly images: CauseImageStorage | null,
+  ) {}
+
+  /** Sets the public total (stamped with today's date) and/or the Bankily number. */
+  async updateSummary(input: UpdateDonationSummary) {
+    await this.prisma.$transaction(async (tx) => {
+      if (input.totalAmount !== undefined) {
+        const value = { amount: input.totalAmount, updatedAt: new Date().toISOString() };
+        await tx.appConfig.upsert({
+          where: { key: DONATION_TOTAL_KEY },
+          create: { key: DONATION_TOTAL_KEY, value },
+          update: { value },
+        });
+      }
+      if (input.bankilyPhone !== undefined) {
+        const data = { phoneNumber: input.bankilyPhone, enabled: true };
+        await tx.paymentMethod.upsert({
+          where: { operator: 'bankily' },
+          create: { name: 'Bankily', operator: 'bankily', ...data },
+          update: data,
+        });
+      }
+    });
+    return this.donations.summary();
+  }
 
   paymentMethods() {
     return this.prisma.paymentMethod.findMany({ orderBy: { sortOrder: 'asc' } });
@@ -50,7 +90,12 @@ export class DonationConfigService {
     return this.prisma.donationCause.findMany({ orderBy: { sortOrder: 'asc' } });
   }
 
-  createCause(input: CreateCauseInput) {
+  async createCause(input: CreateCauseInput) {
+    const taken = await this.prisma.donationCause.findUnique({
+      where: { slug: input.slug },
+      select: { id: true },
+    });
+    if (taken) throw new ConflictException({ error: 'cause_slug_taken' });
     return this.prisma.donationCause.create({ data: input });
   }
 
@@ -61,6 +106,65 @@ export class DonationConfigService {
     });
     if (!exists) throw new NotFoundException({ error: 'cause_not_found' });
     return this.prisma.donationCause.update({ where: { id }, data: input });
+  }
+
+  /**
+   * Deletes a cause, or archives it (hidden from donors) when donations already
+   * reference it, so their history stays intact.
+   */
+  async deleteCause(id: string) {
+    const cause = await this.prisma.donationCause.findUnique({
+      where: { id },
+      select: { imageUrl: true, _count: { select: { donations: true } } },
+    });
+    if (!cause) throw new NotFoundException({ error: 'cause_not_found' });
+    if (cause._count.donations > 0) {
+      await this.prisma.donationCause.update({ where: { id }, data: { active: false } });
+      return { deleted: false, archived: true };
+    }
+    await this.prisma.donationCause.delete({ where: { id } });
+    if (cause.imageUrl) await this.images?.remove(cause.imageUrl).catch(() => undefined);
+    return { deleted: true, archived: false };
+  }
+
+  async setCauseImage(id: string, file: { buffer: Buffer; size: number } | undefined) {
+    if (!this.images) throw new ServiceUnavailableException({ error: 'image_storage_unavailable' });
+    if (!file || file.size === 0) throw new BadRequestException({ error: 'image_missing' });
+    if (file.size > MAX_CAUSE_IMAGE_BYTES)
+      throw new BadRequestException({ error: 'image_too_large' });
+    const detected = detectImageType(file.buffer);
+    if (!detected) throw new BadRequestException({ error: 'image_type_not_allowed' });
+
+    const cause = await this.prisma.donationCause.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+    if (!cause) throw new NotFoundException({ error: 'cause_not_found' });
+    const url = await this.images.save(
+      `${id}-${randomUUID()}.${detected.ext}`,
+      file.buffer,
+      detected.type,
+    );
+    const updated = await this.prisma.donationCause.update({
+      where: { id },
+      data: { imageUrl: url },
+    });
+    if (cause.imageUrl) await this.images.remove(cause.imageUrl).catch(() => undefined);
+    return updated;
+  }
+
+  async removeCauseImage(id: string) {
+    const cause = await this.prisma.donationCause.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+    if (!cause) throw new NotFoundException({ error: 'cause_not_found' });
+    const updated = await this.prisma.donationCause.update({
+      where: { id },
+      data: { imageUrl: null },
+    });
+    if (cause.imageUrl) await this.images?.remove(cause.imageUrl).catch(() => undefined);
+    return updated;
   }
 
   async setPresets(presets: number[]) {
@@ -108,6 +212,34 @@ export class AdminConfigController {
     @Body(new ZodValidationPipe(updateCauseSchema)) body: UpdateCauseInput,
   ) {
     return this.config.updateCause(id, body);
+  }
+
+  @Delete('causes/:id')
+  deleteCause(@Param('id', new ZodValidationPipe(uuidSchema)) id: string) {
+    return this.config.deleteCause(id);
+  }
+
+  @Post('causes/:id/image')
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: MAX_CAUSE_IMAGE_BYTES, files: 1 } }),
+  )
+  setCauseImage(
+    @Param('id', new ZodValidationPipe(uuidSchema)) id: string,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    return this.config.setCauseImage(id, file);
+  }
+
+  @Delete('causes/:id/image')
+  removeCauseImage(@Param('id', new ZodValidationPipe(uuidSchema)) id: string) {
+    return this.config.removeCauseImage(id);
+  }
+
+  @Put('donations-summary')
+  updateSummary(
+    @Body(new ZodValidationPipe(updateDonationSummarySchema)) body: UpdateDonationSummary,
+  ) {
+    return this.config.updateSummary(body);
   }
 
   @Put('donation-presets')

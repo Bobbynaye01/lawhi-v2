@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  NotFoundException,
+  Param,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createDonationSchema } from '@lawhi/shared';
@@ -6,13 +18,36 @@ import type { z } from 'zod';
 import { CurrentUser, Public } from '../../common/decorators/auth.decorators';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import type { AuthUser } from '../auth/auth.types';
+import { CAUSE_IMAGE_STORAGE, type CauseImageStorage } from '../storage/cause-image-storage';
 import { submitReferenceSchema, uuidSchema } from './donations.schemas';
 import { DonationsService } from './donations.service';
 import { MAX_PROOF_BYTES } from './proof-file';
 
 @Controller('donations')
 export class DonationsController {
-  constructor(private readonly donations: DonationsService) {}
+  constructor(
+    private readonly donations: DonationsService,
+    @Inject(CAUSE_IMAGE_STORAGE) private readonly images: CauseImageStorage | null,
+  ) {}
+
+  @Public()
+  @Get('summary')
+  summary() {
+    return this.donations.summary();
+  }
+
+  /** Cover images when stored on disk (development); Supabase serves them directly otherwise. */
+  @Public()
+  @Get('cause-images/:name')
+  async causeImage(@Param('name') name: string, @Res() res: Response) {
+    const image = await this.images?.read(name);
+    if (!image) throw new NotFoundException({ error: 'image_not_found' });
+    res.setHeader('Content-Type', image.contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.send(image.content);
+  }
 
   @Public()
   @Get('causes')

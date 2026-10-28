@@ -266,6 +266,12 @@ enum PaymentOperator {
   bci_pay
 }
 
+enum CauseStatus {
+  upcoming
+  ongoing
+  completed
+}
+
 model DonationCause {
   id            String     @id @default(uuid()) @db.Uuid
   slug          String     @unique
@@ -277,6 +283,13 @@ model DonationCause {
   descriptionEn String
   /// Target in MRU; null when the cause has no fixed goal.
   goalAmount    Int?
+  /// Amount collected so far in MRU, entered by an admin (donations arrive outside the app).
+  collectedAmount Int       @default(0)
+  status        CauseStatus @default(ongoing)
+  /// Date of the event or of its completion, when relevant.
+  eventDate     DateTime?  @db.Date
+  /// Public URL of the cover image, uploaded by an admin.
+  imageUrl      String?
   featured      Boolean    @default(false)
   active        Boolean    @default(true)
   sortOrder     Int        @default(0)

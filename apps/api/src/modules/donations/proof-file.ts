@@ -31,3 +31,11 @@ export function detectProofType(content: Buffer): { type: string; ext: string } 
   const found = SIGNATURES.find((s) => s.matches(content));
   return found ? { type: found.type, ext: found.ext } : null;
 }
+
+export const MAX_CAUSE_IMAGE_BYTES = 2 * 1024 * 1024;
+
+/** Like detectProofType, restricted to images (cover pictures of causes). */
+export function detectImageType(content: Buffer): { type: string; ext: string } | null {
+  const found = detectProofType(content);
+  return found?.type.startsWith('image/') ? found : null;
+}

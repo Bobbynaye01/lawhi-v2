@@ -2,6 +2,11 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Env } from '../../config/env';
+import {
+  CAUSE_IMAGE_STORAGE,
+  LocalCauseImageStorage,
+  SupabaseCauseImageStorage,
+} from './cause-image-storage';
 import { LocalProofStorage, PROOF_STORAGE, SupabaseProofStorage } from './proof-storage';
 import { createSupabaseAdmin, SUPABASE_ADMIN } from './supabase-admin';
 
@@ -24,7 +29,22 @@ import { createSupabaseAdmin, SUPABASE_ADMIN } from './supabase-admin';
         return null;
       },
     },
+    {
+      provide: CAUSE_IMAGE_STORAGE,
+      inject: [ConfigService, SUPABASE_ADMIN],
+      useFactory: (config: ConfigService<Env, true>, supabase: SupabaseClient | null) => {
+        const localDir = config.get('LOCAL_STORAGE_DIR', { infer: true });
+        if (localDir) return new LocalCauseImageStorage(localDir);
+        if (supabase) {
+          return new SupabaseCauseImageStorage(
+            supabase,
+            config.get('SUPABASE_CAUSE_IMAGES_BUCKET', { infer: true }),
+          );
+        }
+        return null;
+      },
+    },
   ],
-  exports: [PROOF_STORAGE, SUPABASE_ADMIN],
+  exports: [PROOF_STORAGE, CAUSE_IMAGE_STORAGE, SUPABASE_ADMIN],
 })
 export class StorageModule {}

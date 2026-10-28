@@ -3,6 +3,8 @@ import {
   canTransition,
   createDonationSchema,
   isFinalStatus,
+  slugify,
+  updateDonationSummarySchema,
   updatePaymentMethodSchema,
 } from '../src/donations';
 import { formatMRU } from '../src/money';
@@ -64,5 +66,33 @@ describe('updatePaymentMethodSchema', () => {
     expect(updatePaymentMethodSchema.safeParse({ enabled: true, phoneNumber: null }).success).toBe(
       false,
     );
+  });
+});
+
+describe('donation summary update', () => {
+  it('accepts a total, a Bankily number, or both — and normalises the number', () => {
+    expect(updateDonationSummarySchema.parse({ totalAmount: 150000 })).toEqual({
+      totalAmount: 150000,
+    });
+    expect(updateDonationSummarySchema.parse({ bankilyPhone: '+222 22 33 44 55' })).toEqual({
+      bankilyPhone: '22334455',
+    });
+  });
+
+  it('refuses an empty update, negative or fractional totals, and invalid numbers', () => {
+    expect(updateDonationSummarySchema.safeParse({}).success).toBe(false);
+    expect(updateDonationSummarySchema.safeParse({ totalAmount: -1 }).success).toBe(false);
+    expect(updateDonationSummarySchema.safeParse({ totalAmount: 10.5 }).success).toBe(false);
+    expect(updateDonationSummarySchema.safeParse({ bankilyPhone: '12345678' }).success).toBe(false);
+  });
+});
+
+describe('slugify', () => {
+  it('turns a French title into a URL-safe identifier', () => {
+    expect(slugify('Repas pour orphelins — Ramadan 2026')).toBe(
+      'repas-pour-orphelins-ramadan-2026',
+    );
+    expect(slugify('Construction d’une mosquée')).toBe('construction-d-une-mosquee');
+    expect(slugify('مسجد')).toBe('');
   });
 });

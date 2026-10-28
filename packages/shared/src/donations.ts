@@ -83,3 +83,44 @@ export const updatePaymentMethodSchema = paymentMethodSchema
     message: 'enabled_method_requires_phone',
     path: ['phoneNumber'],
   });
+
+/** Life cycle of a project or event shown to donors. */
+export const CAUSE_STATUSES = ['upcoming', 'ongoing', 'completed'] as const;
+export type CauseStatus = (typeof CAUSE_STATUSES)[number];
+
+/** Upper bound for admin-entered totals (all donations, all projects), in MRU. */
+export const MAX_TOTAL_AMOUNT = 1_000_000_000;
+
+/**
+ * Admin update of the public donations summary: the running total (its date is
+ * set by the server) and the Bankily number donors send money to.
+ */
+export const updateDonationSummarySchema = z
+  .object({
+    totalAmount: z.number().int().min(0).max(MAX_TOTAL_AMOUNT).optional(),
+    bankilyPhone: mauritanianPhoneSchema.optional(),
+  })
+  .refine((s) => s.totalAmount !== undefined || s.bankilyPhone !== undefined, {
+    message: 'nothing_to_update',
+  });
+export type UpdateDonationSummaryInput = z.input<typeof updateDonationSummarySchema>;
+
+export interface DonationSummary {
+  totalAmount: number;
+  currency: typeof CURRENCY;
+  /** When an admin last set the total (ISO date-time), or null if never. */
+  updatedAt: string | null;
+  /** Number to send donations to, or null until an admin sets it. */
+  bankilyPhone: string | null;
+}
+
+/** Lower-case ASCII slug from the French title, e.g. "Repas pour orphelins" → "repas-pour-orphelins". */
+export function slugify(title: string): string {
+  return title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+}

@@ -1,4 +1,9 @@
-import { DONATION_STATUSES, MAX_DONATION_AMOUNT } from '@lawhi/shared';
+import {
+  CAUSE_STATUSES,
+  DONATION_STATUSES,
+  MAX_DONATION_AMOUNT,
+  MAX_TOTAL_AMOUNT,
+} from '@lawhi/shared';
 import { z } from 'zod';
 
 export const uuidSchema = z.string().uuid();
@@ -33,17 +38,36 @@ const localized = {
   descriptionEn: z.string().trim().min(2).max(2000),
 };
 
+/** Editable fields of a cause, without defaults so a partial update never resets them. */
+const causeFields = {
+  ...localized,
+  goalAmount: z.number().int().positive().max(MAX_TOTAL_AMOUNT).nullable(),
+  collectedAmount: z.number().int().min(0).max(MAX_TOTAL_AMOUNT),
+  status: z.enum(CAUSE_STATUSES),
+  /** Calendar date (YYYY-MM-DD) of the event, or null. */
+  eventDate: z.iso
+    .date()
+    .transform((d) => new Date(`${d}T00:00:00.000Z`))
+    .nullable(),
+  featured: z.boolean(),
+  active: z.boolean(),
+  sortOrder: z.number().int().min(0).max(1000),
+};
+
 export const createCauseSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]{2,60}$/),
-  ...localized,
-  goalAmount: z.number().int().positive().max(1_000_000_000).nullable().default(null),
-  featured: z.boolean().default(false),
-  active: z.boolean().default(true),
-  sortOrder: z.number().int().min(0).max(1000).default(0),
+  ...causeFields,
+  goalAmount: causeFields.goalAmount.default(null),
+  collectedAmount: causeFields.collectedAmount.default(0),
+  status: causeFields.status.default('ongoing'),
+  eventDate: causeFields.eventDate.default(null),
+  featured: causeFields.featured.default(false),
+  active: causeFields.active.default(true),
+  sortOrder: causeFields.sortOrder.default(0),
 });
 export type CreateCauseInput = z.infer<typeof createCauseSchema>;
 
-export const updateCauseSchema = createCauseSchema.omit({ slug: true }).partial();
+export const updateCauseSchema = z.object(causeFields).partial();
 export type UpdateCauseInput = z.infer<typeof updateCauseSchema>;
 
 export const donationPresetsSchema = z.object({

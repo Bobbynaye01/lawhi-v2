@@ -9,8 +9,8 @@ import {
   ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { canTransition, type DonationStatus } from '@lawhi/shared';
-import type { z } from 'zod';
+import { canTransition, CURRENCY, type DonationStatus, type DonationSummary } from '@lawhi/shared';
+import { z } from 'zod';
 import type { createDonationSchema } from '@lawhi/shared';
 import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
@@ -19,6 +19,13 @@ import type { AdminDonationsQuery } from './donations.schemas';
 import { detectProofType, MAX_PROOF_BYTES } from './proof-file';
 
 type CreateDonation = z.output<typeof createDonationSchema>;
+
+/** AppConfig key of the admin-entered running total of donations. */
+export const DONATION_TOTAL_KEY = 'donations.total';
+export const donationTotalSchema = z.object({
+  amount: z.number().int().min(0),
+  updatedAt: z.iso.datetime(),
+});
 
 /** Unambiguous alphabet (no 0/O, 1/I/L) for codes read over the phone. */
 const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -74,6 +81,24 @@ export class DonationsService {
       confirmedAmount: byCause.get(cause.id)?._sum.amount ?? 0,
       confirmedCount: byCause.get(cause.id)?._count ?? 0,
     }));
+  }
+
+  /** What every donor sees at the top of the Sadaqa screen. */
+  async summary(): Promise<DonationSummary> {
+    const [row, bankily] = await Promise.all([
+      this.prisma.appConfig.findUnique({ where: { key: DONATION_TOTAL_KEY } }),
+      this.prisma.paymentMethod.findUnique({
+        where: { operator: 'bankily' },
+        select: { phoneNumber: true, enabled: true },
+      }),
+    ]);
+    const total = donationTotalSchema.safeParse(row?.value);
+    return {
+      totalAmount: total.success ? total.data.amount : 0,
+      currency: CURRENCY,
+      updatedAt: total.success ? total.data.updatedAt : null,
+      bankilyPhone: bankily?.enabled ? bankily.phoneNumber : null,
+    };
   }
 
   /** Only methods an admin has enabled with a real number. */
